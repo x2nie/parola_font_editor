@@ -138,7 +138,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 		// VARS
 		regEx = /const\s+uint8_t\s+(\w+)\s*=\s*([0-9a-fA-Fx]+)\s*;/g;
 		while ((word = regEx.exec(text))) {
-			console.log('var:',word);
+			// console.log('var:',word);
 			// const startPos = vsdoc.positionAt(word.index);
 			// line = lines[startPos.line+2];
 			const ani = {
@@ -166,6 +166,12 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 		// Local path to script and css for the webview
 		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(
 			this.context.extensionUri, 'media', 'catScratch.js'));
+		// const owlUri = webview.asWebviewUri(vscode.Uri.joinPath(
+		// 	this.context.extensionUri, 'media', 'owl.js'));
+		const owlUri = webview.asWebviewUri(vscode.Uri.joinPath(
+			this.context.extensionUri, 'media', 'owl.iife.runtime.js'));
+		const owlTemplateUri = webview.asWebviewUri(vscode.Uri.joinPath(
+			this.context.extensionUri, 'templates', 'templates.js'));
 
 		const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(
 			this.context.extensionUri, 'media', 'reset.css'));
@@ -206,6 +212,8 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 						<button>Scratch!</button>
 					</div>
 				
+				<script nonce="${nonce}" src="${owlUri}"></script>
+				<script nonce="${nonce}" src="${owlTemplateUri}"></script>
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;

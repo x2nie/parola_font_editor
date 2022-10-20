@@ -1,7 +1,37 @@
 // @ts-check
+// @ts-ignore
+const { Component, useState, mount,xml } = owl;
+
+// console.log('OWL:', owl.__info__)
+
+class Greeter extends Component {
+    static template = "Greeter";
+    
+    setup() {
+        this.state = useState({ word: 'Hello bosZ!' });
+    }
+
+    toggle() {
+        this.state.word = this.state.word === 'Hi' ? 'Hello' : 'Hi';
+    }
+}
+
+// Main root component
+class Root extends Component {
+    static components = { Greeter };
+    static template = "Root"
+
+    setup() {
+        this.state = useState({ name: 'World'});
+    }
+}
+
 
 // Script run within the webview itself.
 (function () {
+
+	// Application setup
+	mount(Root, document.body, { dev: true });
 
 	// Get a reference to the VS Code webview api.
 	// We use this API to post messages back to our extension.
