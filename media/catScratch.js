@@ -1,6 +1,7 @@
 // @ts-check
+
 // @ts-ignore
-const { Component, useState, mount,xml } = owl;
+const { Component, reactive, useState, mount,xml } = owl;
 
 // console.log('OWL:', owl.__info__)
 
@@ -9,10 +10,12 @@ class Greeter extends Component {
     
     setup() {
         this.state = useState({ word: 'Hello bosZ!' });
+        // this.a = useState(th)
     }
 
     toggle() {
         this.state.word = this.state.word === 'Hi' ? 'Hello' : 'Hi';
+        // this.env.a ++;
     }
 }
 
@@ -30,127 +33,81 @@ class Root extends Component {
 // Script run within the webview itself.
 (function () {
 
-	// Application setup
-	mount(Root, document.body, { dev: true });
+    // Application setup
+    const env = reactive({ a: 1 }, () => console.log("changed:",arguments));
+    mount(Root, document.body, { env, dev: true });
 
-	// Get a reference to the VS Code webview api.
-	// We use this API to post messages back to our extension.
+    // Get a reference to the VS Code webview api.
+    // We use this API to post messages back to our extension.
 
-	// @ts-ignore
-	const vscode = acquireVsCodeApi();
-
-
-	const notesContainer = /** @type {HTMLElement} */ (document.querySelector('.anims'));
-
-	const addButtonContainer = document.querySelector('.add-button');
-	// @ts-ignore
-	addButtonContainer.querySelector('button').addEventListener('click', () => {
-		vscode.postMessage({
-			type: 'add'
-		});
-	})
-
-	const errorContainer = document.createElement('div');
-	document.body.appendChild(errorContainer);
-	errorContainer.className = 'error'
-	errorContainer.style.display = 'none'
-
-	/**
-	 * Render the document in the webview. coy
-	 */
-	function updateContent(/** @type {string} */ text, /** @type {object} */  data) {
-		notesContainer.innerText = '';
-		console.log('data:',data)
-		const vars = data.vars;
-		data.anims.forEach(anim => {
-			
-			const element = document.createElement('li');
-			// element.className = 'note';
-			// console.log('found:',word)
-			element.innerText = anim.name;
-			notesContainer.appendChild(element);
-
-			//array
-			const textContent = document.createElement('span');
-			textContent.innerText = ` ${vars[anim.heightVar]} x ${vars[anim.widthVar]}`;
-			element.appendChild(textContent);
-			
-			
-		});
-		return;
+    // @ts-ignore
+    const vscode = acquireVsCodeApi();
 
 
+    const notesContainer = /** @type {HTMLElement} */ (document.querySelector('.anims'));
 
-		let json;
-		try {
-			if (!text) {
-				text = '{}';
-			}
-			json = JSON.parse(text);
-		} catch {
-			notesContainer.style.display = 'none';
-			errorContainer.innerText = 'Error: Document is not valid json';
-			errorContainer.style.display = '';
-			return;
-		}
-		notesContainer.style.display = '';
-		errorContainer.style.display = 'none';
+    const addButtonContainer = document.querySelector('.add-button');
+    // @ts-ignore
+    addButtonContainer.querySelector('button').addEventListener('click', () => {
+        vscode.postMessage({
+            type: 'add'
+        });
+    })
 
-		// Render the scratches
-		notesContainer.innerHTML = '';
-		for (const note of json.scratches || []) {
-			const element = document.createElement('div');
-			element.className = 'note';
-			notesContainer.appendChild(element);
+    const errorContainer = document.createElement('div');
+    document.body.appendChild(errorContainer);
+    errorContainer.className = 'error'
+    errorContainer.style.display = 'none'
 
-			const text = document.createElement('div');
-			text.className = 'text';
-			const textContent = document.createElement('span');
-			textContent.innerText = note.text;
-			text.appendChild(textContent);
-			element.appendChild(text);
+    /**
+     * Render the document in the webview. coy
+     */
+    function updateContent(/** @type {string} */ text, /** @type {object} */  data) {
+        notesContainer.innerText = '';
+        console.log('data:',data)
+        const vars = data.vars;
+        data.anims.forEach(anim => {
+            
+            const element = document.createElement('li');
+            // element.className = 'note';
+            // console.log('found:',word)
+            element.innerText = anim.name;
+            notesContainer.appendChild(element);
 
-			const created = document.createElement('div');
-			created.className = 'created';
-			created.innerText = new Date(note.created).toUTCString();
-			element.appendChild(created);
+            //array
+            const textContent = document.createElement('span');
+            textContent.innerText = ` ${vars[anim.heightVar]} x ${vars[anim.widthVar]}`;
+            element.appendChild(textContent);
+            
+            
+        });
+        return;
+    }
 
-			const deleteButton = document.createElement('button');
-			deleteButton.className = 'delete-button';
-			deleteButton.addEventListener('click', () => {
-				vscode.postMessage({ type: 'delete', id: note.id, });
-			});
-			element.appendChild(deleteButton);
-		}
+    // Handle messages sent from the extension to the webview
+    window.addEventListener('message', event => {
+        const message = event.data; // The json data that the extension sent
+        switch (message.type) {
+            case 'update':
+                // console.log('data:',message.data)
+                const text = message.text;
+                const data = message.data;
 
-		// @ts-ignore
-		notesContainer.appendChild(addButtonContainer);
-	}
+                // Update our webview's content
+                updateContent(text, data);
 
-	// Handle messages sent from the extension to the webview
-	window.addEventListener('message', event => {
-		const message = event.data; // The json data that the extension sent
-		switch (message.type) {
-			case 'update':
-				// console.log('data:',message.data)
-				const text = message.text;
-				const data = message.data;
+                // Then persist state information.
+                // This state is returned in the call to `vscode.getState` below when a webview is reloaded.
+                vscode.setState({ text, data });
 
-				// Update our webview's content
-				updateContent(text, data);
+                return;
+        }
+    });
 
-				// Then persist state information.
-				// This state is returned in the call to `vscode.getState` below when a webview is reloaded.
-				vscode.setState({ text, data });
-
-				return;
-		}
-	});
-
-	// Webviews are normally torn down when not visible and re-created when they become visible again.
-	// State lets us save information across these re-loads
-	const state = vscode.getState();
-	if (state) {
-		updateContent(state.text, state.data);
-	}
+    // Webviews are normally torn down when not visible and re-created when they become visible again.
+    // State lets us save information across these re-loads
+    const state = vscode.getState();
+    if (state) {
+        updateContent(state.text, state.data);
+    }
 }());
