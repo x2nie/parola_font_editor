@@ -2,6 +2,7 @@
 <templates>
   <div t-name="Sprite" class="sprite">
     <t t-esc="props.line.line"/>
+	<span t-foreach="state.cols" t-as="col" t-key="col_index" t-raw="col" />
   </div>
 
   <div t-name="Anim" class="greeter">
@@ -11,7 +12,6 @@
   </div>
 
   <t t-name="Root">
-    <t t-esc="props.line.line"/>
 	 <t t-foreach="env.anims" t-as="anim" t-key="anim.name">
           <Anim name="anim.name" lines="anim.data" />
 	</t>
