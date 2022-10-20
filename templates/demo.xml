@@ -1,10 +1,19 @@
 
 <templates>
-  <div t-name="Greeter" class="greeter" t-on-click="toggle">
-    <t t-esc="state.word"/>, <t t-esc="props.name"/>
+  <div t-name="Sprite" class="sprite">
+    <t t-esc="props.line.line"/>
+  </div>
+
+  <div t-name="Anim" class="greeter">
+	 <t t-foreach="props.lines" t-as="sprite" t-key="sprite_index">
+          <Sprite line="sprite"/>
+	</t>
   </div>
 
   <t t-name="Root">
-    <Greeter name="state.name"/>
+    <t t-esc="props.line.line"/>
+	 <t t-foreach="env.anims" t-as="anim" t-key="anim.name">
+          <Anim name="anim.name" lines="anim.data" />
+	</t>
   </t>
 </templates>

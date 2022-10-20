@@ -87,10 +87,14 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 				case 'delete':
 					this.deleteScratch(document, e.id);
 					return;
+
+				case 'firstload':
+					updateWebview();
+					return;
 			}
 		});
 
-		updateWebview();
+		// updateWebview();
 	}
 	private getDataForWebview(vsdoc: vscode.TextDocument): object {
 		const anims : Array<object> = [];

@@ -1,23 +1,51 @@
-owl.App.registerTemplate("Greeter", function Greeter(app, bdom, helpers
+owl.App.registerTemplate("Sprite", function Sprite(app, bdom, helpers
 ) {
   let { text, createBlock, list, multi, html, toggler, comment } = bdom;
   
-  let block1 = createBlock(`<div class="greeter" block-handler-0="click"><block-text-1/>, <block-text-2/></div>`);
+  let block1 = createBlock(`<div class="sprite"><block-text-0/></div>`);
   
   return function template(ctx, node, key = "") {
-    let hdlr1 = [ctx['toggle'], ctx];
-    let txt1 = ctx['state'].word;
-    let txt2 = ctx['props'].name;
-    return block1([hdlr1, txt1, txt2]);
+    let txt1 = ctx['props'].line.line;
+    return block1([txt1]);
+  }
+});
+
+owl.App.registerTemplate("Anim", function Anim(app, bdom, helpers
+) {
+  let { text, createBlock, list, multi, html, toggler, comment } = bdom;
+  let { prepareList, withKey } = helpers;
+  const comp1 = app.createComponent(`Sprite`, true, false, false, false);
+  
+  let block1 = createBlock(`<div class="greeter"><block-child-0/></div>`);
+  
+  return function template(ctx, node, key = "") {
+    ctx = Object.create(ctx);
+    const [k_block2, v_block2, l_block2, c_block2] = prepareList(ctx['props'].lines);;
+    for (let i1 = 0; i1 < l_block2; i1++) {
+      ctx[`sprite`] = v_block2[i1];
+      ctx[`sprite_index`] = i1;
+      const key1 = ctx['sprite_index'];
+      c_block2[i1] = withKey(comp1({line: ctx['sprite']}, key + `__1__${key1}`, node, this, null), key1);
+    }
+    const b2 = list(c_block2);
+    return block1([], [b2]);
   }
 });
 
 owl.App.registerTemplate("Root", function Root(app, bdom, helpers
 ) {
   let { text, createBlock, list, multi, html, toggler, comment } = bdom;
-  const comp1 = app.createComponent(`Greeter`, true, false, false, false);
+  let { prepareList, withKey } = helpers;
+  const comp1 = app.createComponent(`Anim`, true, false, false, false);
   
   return function template(ctx, node, key = "") {
-    return comp1({name: ctx['state'].name}, key + `__1`, node, this, null);
+    ctx = Object.create(ctx);
+    const [k_block1, v_block1, l_block1, c_block1] = prepareList(ctx['env'].anims);;
+    for (let i1 = 0; i1 < l_block1; i1++) {
+      ctx[`anim`] = v_block1[i1];
+      const key1 = ctx['anim'].name;
+      c_block1[i1] = withKey(comp1({name: ctx['anim'].name,lines: ctx['anim'].data}, key + `__1__${key1}`, node, this, null), key1);
+    }
+    return list(c_block1);
   }
 });

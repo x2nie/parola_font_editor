@@ -1,9 +1,96 @@
+// Script run within the webview itself.
+(function () {
 // @ts-check
 
 // @ts-ignore
-const { Component, reactive, useState, mount,xml } = owl;
+// In this implementation, we use the owl reactivity mechanism.
+const { Component, useState, mount, useRef, onPatched, onMounted, reactive, useEnv, useEffect } = owl;
 
-// console.log('OWL:', owl.__info__)
+function useStore() {
+    const env = useEnv();
+    return useState(env.store);
+}
+
+const sprites = reactive({ anims: [], vars: {} }, () => console.log("changed"));
+
+//------------------------------------------------------------------------------
+// Anim store
+//------------------------------------------------------------------------------
+class AnimList {
+    constructor(anims) {
+        this.anims = anims || [];
+        const taskIds = this.anims.map((t) => t.id);
+        this.nextId = taskIds.length ? Math.max(...taskIds) + 1 : 1;
+    }
+
+    replaceAnims(anims) {
+        this.anims = anims
+        for (let index = 0; index < anims.length; index++) {
+            if (arr[index] === 'a') {
+              arr[index] = 'z';
+              break;
+            }
+        }
+    }
+
+    // addAnim(text) {
+    //     text = text.trim();
+    //     if (text) {
+    //         const anim = {
+    //             id: this.nextId++,
+    //             text: text,
+    //             isCompleted: false,
+    //         };
+    //         this.anims.push(anim);
+    //     }
+    // }
+
+    toggleAnim(anim) {
+        anim.isCompleted = !anim.isCompleted;
+    }
+
+    toggleAnim(id) {
+        const anim = this.anims.find(t => t.id === id);
+        anim.isCompleted = !anim.isCompleted;
+    }
+
+    toggleAll(value) {
+        for (let anim of this.anims) {
+            anim.isCompleted = value;
+        }
+    }
+    
+    clearCompleted() {
+        const anims = this.anims.filter(t => t.isCompleted);
+        for (let anim of anims) {
+            this.deleteAnim(anim);
+        }
+    }
+    
+    deleteAnim(id) {
+        const index = this.anims.findIndex((t) => t.id === id);
+        this.anims.splice(index, 1);
+    }
+    
+    updateAnim(id, text) {
+        const value = text.trim();
+        if (!value) {
+            this.deleteAnim(id);
+        } else {
+            const anim = this.anims.find(t => t.id === id);
+            anim.text = value;
+        }
+    }
+}
+
+function createAnimStore() {
+    const saveAnims = () => localStorage.setItem("todoapp", JSON.stringify(taskStore.anims));
+    const initialAnims = JSON.parse(localStorage.getItem("todoapp") || "[]");
+    const taskStore = reactive(new AnimList(initialAnims), saveAnims);
+    saveAnims();
+    return taskStore;
+}
+  
 
 class Greeter extends Component {
     static template = "Greeter";
@@ -19,23 +106,44 @@ class Greeter extends Component {
     }
 }
 
-// Main root component
-class Root extends Component {
-    static components = { Greeter };
-    static template = "Root"
+class Sprite extends Component {
+    static template = "Sprite"
 
     setup() {
         this.state = useState({ name: 'World'});
     }
 }
 
+class Anim extends Component {
+    static components = { Sprite };
+    static template = "Anim"
 
-// Script run within the webview itself.
-(function () {
+    setup() {
+        this.state = useState({ name: 'World'});
+        // this.env = useEnv();
+    }
+}
 
-    // Application setup
-    const env = reactive({ a: 1 }, () => console.log("changed:",arguments));
+// Main root component
+class Root extends Component {
+    static components = { Anim };
+    static template = "Root"
+
+    setup() {
+        this.state = useState({ name: 'World'});
+        this.env = useState(sprites);
+    }
+}
+
+
+        // Application setup
+    // const env = reactive({ a: 1 }, () => console.log("changed:",arguments));
+    //------------------------------------------------------------------------------
+    // App Initialization
+    //------------------------------------------------------------------------------
+    const env = { store: createAnimStore(), anims:[], vars:{} };
     mount(Root, document.body, { env, dev: true });
+
 
     // Get a reference to the VS Code webview api.
     // We use this API to post messages back to our extension.
@@ -63,6 +171,10 @@ class Root extends Component {
      * Render the document in the webview. coy
      */
     function updateContent(/** @type {string} */ text, /** @type {object} */  data) {
+        sprites.anims = data.anims;
+        sprites.vars = data.vars;
+        // const env = useEnv();
+        // env.anims.state = data.anims;
         notesContainer.innerText = '';
         console.log('data:',data)
         const vars = data.vars;
@@ -104,10 +216,16 @@ class Root extends Component {
         }
     });
 
+
+
+    
     // Webviews are normally torn down when not visible and re-created when they become visible again.
     // State lets us save information across these re-loads
-    const state = vscode.getState();
-    if (state) {
-        updateContent(state.text, state.data);
-    }
+    // const state = vscode.getState();
+    // if (state) {
+    //     // updateContent(state.text, state.data);
+    // }
+    vscode.postMessage({
+        type: 'firstload'
+    });
 }());
