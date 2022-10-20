@@ -31,6 +31,7 @@
 	function updateContent(/** @type {string} */ text, /** @type {object} */  data) {
 		notesContainer.innerText = '';
 		console.log('data:',data)
+		const vars = data.vars;
 		data.anims.forEach(anim => {
 			
 			const element = document.createElement('li');
@@ -41,7 +42,7 @@
 
 			//array
 			const textContent = document.createElement('span');
-			textContent.innerText = `${anim.heightVar}`;
+			textContent.innerText = ` ${vars[anim.heightVar]} x ${vars[anim.widthVar]}`;
 			element.appendChild(textContent);
 			
 			
