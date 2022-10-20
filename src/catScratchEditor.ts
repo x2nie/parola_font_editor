@@ -46,8 +46,8 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 		webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview);
 
 		const getData = () => {
-			return this.getDataForWebview(document)
-		}
+			return this.getDataForWebview(document);
+		};
 
 		function updateWebview() {
 			webviewPanel.webview.postMessage({
@@ -93,11 +93,11 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 		updateWebview();
 	}
 	private getDataForWebview(vsdoc: vscode.TextDocument): object {
-		const anims : Array<Object> = []
-		const text = vsdoc.getText()
+		const anims : Array<object> = [];
+		const text = vsdoc.getText();
 		const regEx = /const\s+uint8_t\s+PROGMEM\s(\w+)\s*\[(\w+)\s*\*\s*(\w+)\]/g;
 		// console.log('vsdoc:',vsdoc)
-		const eol = vsdoc.eol == 1 ? '\n' : '\r\n'
+		const eol = vsdoc.eol == 1 ? '\n' : '\r\n';
 		const lines = text.split(eol);
 		let word;
 		while ((word = regEx.exec(text))) {
@@ -107,8 +107,8 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 				name: word[1],
 				heightVar: word[2],
 				widthVar: word[3],
-			}
-			anims.push(ani)
+			};
+			anims.push(ani);
 
 			//array
 		}
