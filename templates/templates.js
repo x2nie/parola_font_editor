@@ -32,7 +32,7 @@ owl.App.registerTemplate("Anim", function Anim(app, bdom, helpers
   let { prepareList, withKey } = helpers;
   const comp1 = app.createComponent(`Sprite`, true, false, false, false);
   
-  let block1 = createBlock(`<div class="greeter"><block-text-0/><block-child-0/></div>`);
+  let block1 = createBlock(`<div class="greeter"><block-text-0/><block-child-0/><hr/></div>`);
   
   return function template(ctx, node, key = "") {
     let txt1 = ctx['anim'].name;
@@ -44,6 +44,7 @@ owl.App.registerTemplate("Anim", function Anim(app, bdom, helpers
       const key1 = ctx['sprite_index'];
       c_block2[i1] = withKey(comp1({line: ctx['sprite']}, key + `__1__${key1}`, node, this, null), key1);
     }
+    ctx = ctx.__proto__;
     const b2 = list(c_block2);
     return block1([txt1], [b2]);
   }

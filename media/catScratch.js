@@ -131,7 +131,7 @@
                 () => {                    
                     this.draw();
                 },
-                () => [this.att]
+                () => [this.att, this.state.cols]
             );
         }
 
@@ -152,13 +152,15 @@
             canvas.height = this.att.height;
             const ctx = canvas.getContext("2d");
             // ctx.fillStyle = "#FF0000";
-            ctx.fillStyle = ctx.createPattern(sprites.patternOff, "repeat");
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // ctx.fillStyle = ctx.createPattern(sprites.patternOff, "repeat");
+            // ctx.fillRect(0, 0, canvas.width, canvas.height);
             // console.log('drawing canvas @:', canvas.width, canvas.height);
             this.state.cols.forEach((col, x) => {
                 for (let y = 0; y < 8; y++) {
                     if(col & (1 << y)){
                         ctx.drawImage(sprites.patternOn, x * led.width, y* led.width);
+                    } else {
+                        ctx.drawImage(sprites.patternOff, x * led.width, y* led.width);                        
                     }
                 }
             });
@@ -167,6 +169,7 @@
 
         toggle(i) {
             this.state.cols[i] = this.state.cols[i] === 0 ? 0xff : 0;
+            // this.draw();
             const hexs = this.state.cols.map(n => `0x${n <= 0x0f? '0': '' }${n.toString(16)}`)
             vscode.postMessage({
                 type: 'line-modified',
