@@ -2,7 +2,9 @@
 <templates>
   <div t-name="Sprite" class="sprite">
     <t t-esc="props.line.line"/>
-	<span t-foreach="state.cols" t-as="col" t-key="col_index" t-raw="col" />
+	<t t-foreach="state.cols" t-as="col" t-key="col_index">
+		<span t-raw="col" t-on-click="() => this.toggle(col_index)"/>
+	</t>
   </div>
 
   <div t-name="Anim" class="greeter">

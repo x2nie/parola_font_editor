@@ -101,10 +101,12 @@
         static template = "Sprite"
 
         setup() {
-            this.state = useState({ indent: 0, cols: [] });
+            this.state = useState({ changing:true, lineIndex: -1, indent: 0, cols: [] });
             useEffect(
                 () => {
+                    this.state.changing = true;
                     const line = this.props.line.line;
+                    this.state.lineIndex = this.props.line.lineIndex;
                     this.state.indent = line.length - line.replace(/^\s+/, '').length;
                     const numbers = [];
                     let word;
@@ -112,10 +114,35 @@
                         const n = word[1];
                         numbers.push(Number(n));
                     }
+                    // this.state.cols.splice(0, this.state.cols.length, numbers);
                     this.state.cols = numbers;
+                    this.state.changing = false;
                 },
                 () => [this.props.line]
             );
+            /* useEffect(
+                () => {
+                    console.log('useEffect:', this.state.changing);
+                    if(!this.state.changing){
+                        const hexs = this.state.cols.map(n => n.toString(16))
+                        vscode.postMessage({
+                            type: 'line-modified',
+                            index: this.state.lineIndex,
+                            data: `${' '.repeat(this.state.indent)}${hexs.join(', ')}`
+                        });
+                    }
+                },
+                () => [this.state.cols]
+            ) */
+        }
+        toggle(i) {
+            this.state.cols[i] = this.state.cols[i] === 0 ? 0xff : 0;
+            const hexs = this.state.cols.map(n => `0x${n.toString(16)}`)
+            vscode.postMessage({
+                type: 'line-modified',
+                index: this.state.lineIndex,
+                data: `${' '.repeat(this.state.indent)}${hexs.join(', ')},`
+            });
         }
     }
 

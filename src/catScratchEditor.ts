@@ -68,6 +68,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 
 		const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
 			if (e.document.uri.toString() === document.uri.toString()) {
+				console.log('DOC-changed-by outer. e:', e);
 				updateWebview();
 			}
 		});
@@ -88,6 +89,10 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 					this.deleteScratch(document, e.id);
 					return;
 
+				case 'line-modified':
+					this.updatetDocumentLine(document, e.index, e.data);
+					return;
+
 				case 'firstload':
 					updateWebview();
 					return;
@@ -96,6 +101,24 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 
 		// updateWebview();
 	}
+
+	private updatetDocumentLine(document: vscode.TextDocument, lineIndex: number, line:string) {
+		const edit = new vscode.WorkspaceEdit();
+		const range = document.positionAt(lineIndex);
+		console.log('line-edit:', line, '@', lineIndex, 'range:',range);
+
+		// Just replace the entire document every time for this example extension.
+		// A more complete extension should compute minimal edits instead.
+		edit.replace(
+			document.uri,
+			new vscode.Range(lineIndex, 0, lineIndex, range.character),
+			// JSON.stringify(json, null, 2)
+			line
+		);
+
+		return vscode.workspace.applyEdit(edit);
+	}
+
 	private getDataForWebview(vsdoc: vscode.TextDocument): object {
 		const anims : Array<object> = [];
 		const vars : {[key:string] : any} = {};
