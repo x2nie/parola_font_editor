@@ -143,9 +143,11 @@
         }
 
         draw(){
+            // @ts-check
+
             // console.log('canvas:', this.canvas);
             if(!this.canvas.el) return;
-            let canvas = this.canvas.el;
+            let canvas = /** @type {HTMLCanvasElement} */ this.canvas.el;
             canvas.width = this.att.width;
             canvas.height = this.att.height;
             const ctx = canvas.getContext("2d");
@@ -153,7 +155,14 @@
             ctx.fillStyle = ctx.createPattern(sprites.patternOff, "repeat");
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             // console.log('drawing canvas @:', canvas.width, canvas.height);
-            // canvas = null;
+            this.state.cols.forEach((col, x) => {
+                for (let y = 0; y < 8; y++) {
+                    if(col & (1 << y)){
+                        ctx.drawImage(sprites.patternOn, x * led.width, y* led.width);
+                    }
+                }
+            });
+                
         }
 
         toggle(i) {
