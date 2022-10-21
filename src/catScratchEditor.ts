@@ -234,6 +234,10 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 				<title>Cat Scratch</title>
 			</head>
 			<body>
+				<div class="hidden-assets">
+					<canvas id="pat-on"></canvas>
+					<canvas id="pat-off"></canvas>
+				</div>
 				<ul class="anims">
 				</ul>
 					<div class="add-button">

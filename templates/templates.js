@@ -3,10 +3,12 @@ owl.App.registerTemplate("Sprite", function Sprite(app, bdom, helpers
   let { text, createBlock, list, multi, html, toggler, comment } = bdom;
   let { prepareList, safeOutput, withKey } = helpers;
   
-  let block1 = createBlock(`<div class="sprite"><block-text-0/><block-child-0/></div>`);
+  let block1 = createBlock(`<div class="sprite"><block-text-0/><!-- <canvas t-ref="canvas" t-attf-width="#{att.width}px" t-attf-height="#{att.height}px"/> --><canvas block-ref="1"/><block-child-0/></div>`);
   let block3 = createBlock(`<span block-handler-0="click"><block-child-0/></span>`);
   
   return function template(ctx, node, key = "") {
+    const refs = ctx.__owl__.refs;
+    const ref1 = (el) => refs[`canvas`] = el;
     let txt1 = ctx['props'].line.line;
     ctx = Object.create(ctx);
     const [k_block2, v_block2, l_block2, c_block2] = prepareList(ctx['state'].cols);;
@@ -20,7 +22,7 @@ owl.App.registerTemplate("Sprite", function Sprite(app, bdom, helpers
       c_block2[i1] = withKey(block3([hdlr1], [b4]), key1);
     }
     const b2 = list(c_block2);
-    return block1([txt1], [b2]);
+    return block1([txt1, ref1], [b2]);
   }
 });
 

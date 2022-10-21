@@ -10,6 +10,11 @@ body.vscode-dark {
 	/* background-image: url(./sand-dark.jpg); */
 }
 
+.hidden-assets {
+	/* max-height: 0; */
+	background-color: yellow;
+}
+
 .notes {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, 100px);
@@ -63,3 +68,4 @@ body.vscode-dark {
 .note:hover .delete-button {
 	display: block;
 }
+

@@ -97,11 +97,16 @@
    
 
     const numberExp = /([0-9a-fA-Fx]+)/g;
+    const led = {width: 15, padding:2}
+
     class Sprite extends Component {
         static template = "Sprite"
 
         setup() {
             this.state = useState({ changing:true, lineIndex: -1, indent: 0, cols: [] });
+            this.att = useState({width: this.state.cols.length * led.width , 
+                height: 8 * led.width})
+            this.canvas = useRef('canvas')
             useEffect(
                 () => {
                     this.state.changing = true;
@@ -117,11 +122,40 @@
                     // this.state.cols.splice(0, this.state.cols.length, numbers);
                     this.state.cols = numbers;
                     this.state.changing = false;
+                    // this.draw();
+                    this.att.width = this.state.cols.length * led.width 
                 },
                 () => [this.props.line]
             );
-            
+            useEffect(
+                () => {                    
+                    this.draw();
+                },
+                () => [this.att]
+            );
         }
+
+        get att0(){
+            return {width: this.state.cols.length * led.width , 
+                    height: 8 * led.width}
+            return {width: `${this.state.cols.length * (led.width )}px`, 
+                    height: `${8 * (led.width)}px`}
+        }
+
+        draw(){
+            // console.log('canvas:', this.canvas);
+            if(!this.canvas.el) return;
+            let canvas = this.canvas.el;
+            canvas.width = this.att.width;
+            canvas.height = this.att.height;
+            const ctx = canvas.getContext("2d");
+            // ctx.fillStyle = "#FF0000";
+            ctx.fillStyle = ctx.createPattern(sprites.patternOff, "repeat");
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // console.log('drawing canvas @:', canvas.width, canvas.height);
+            // canvas = null;
+        }
+
         toggle(i) {
             this.state.cols[i] = this.state.cols[i] === 0 ? 0xff : 0;
             const hexs = this.state.cols.map(n => `0x${n <= 0x0f? '0': '' }${n.toString(16)}`)
@@ -169,12 +203,35 @@
 
 
     // Application setup
+    
+    function drawPattern(canvasId, turnOn){
+        const canvas = /** @type {HTMLElement} */ document.getElementById(canvasId);
+        // canvas.setAttribute('width', `${led.width}px`)
+        // canvas.setAttribute('height', `${led.width}px`)
+        canvas.width = led.width;
+        canvas.height = led.width;
+        const context = canvas.getContext('2d');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = centerX - led.padding;
+
+        context.beginPath();
+        context.fillStyle = "black";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+
+        context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+        context.fillStyle = turnOn ? 'red' : '#444';
+        context.fill();
+        return canvas;
+    }
+    sprites.patternOn = drawPattern('pat-on', true);
+    sprites.patternOff = drawPattern('pat-off', false);
     // const env = reactive({ a: 1 }, () => console.log("changed:",arguments));
     //------------------------------------------------------------------------------
     // App Initialization
     //------------------------------------------------------------------------------
     // const env = { store: createAnimStore(), anims: [], vars: {} };
-    mount(Root, document.body, {  dev: true });
+    mount(Root, document.body, {  dev: false });
 
 
     // Get a reference to the VS Code webview api.
@@ -184,7 +241,9 @@
     const vscode = acquireVsCodeApi();
 
 
-    const notesContainer = /** @type {HTMLElement} */ (document.querySelector('.anims'));
+
+    // const cvPatOff = /** @type {HTMLElement} */ (document.getElementById('pat-off'));
+
 
     const addButtonContainer = document.querySelector('.add-button');
     // @ts-ignore
@@ -207,25 +266,6 @@
         sprites.anims = data.anims;
         sprites.vars = data.vars;
         return;
-        // const env = useEnv();
-        // env.anims.state = data.anims;
-        notesContainer.innerText = '';
-        const vars = data.vars;
-        data.anims.forEach(anim => {
-
-            const element = document.createElement('li');
-            // element.className = 'note';
-            // console.log('found:',word)
-            element.innerText = anim.name;
-            notesContainer.appendChild(element);
-
-            //array
-            const textContent = document.createElement('span');
-            textContent.innerText = ` ${vars[anim.heightVar]} x ${vars[anim.widthVar]}`;
-            element.appendChild(textContent);
-
-
-        });
     }
 
     // Handle messages sent from the extension to the webview
