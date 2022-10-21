@@ -15,6 +15,8 @@
   </div>
 
   <t t-name="Root">
+	ROOT:
+	<!-- <span t-raw="raw_anims" /> -->
 	 <t t-foreach="env.anims" t-as="anim" t-key="anim.name">
           <Anim anim="anim" />
 	</t>

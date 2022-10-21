@@ -120,24 +120,11 @@
                 },
                 () => [this.props.line]
             );
-            /* useEffect(
-                () => {
-                    console.log('useEffect:', this.state.changing);
-                    if(!this.state.changing){
-                        const hexs = this.state.cols.map(n => n.toString(16))
-                        vscode.postMessage({
-                            type: 'line-modified',
-                            index: this.state.lineIndex,
-                            data: `${' '.repeat(this.state.indent)}${hexs.join(', ')}`
-                        });
-                    }
-                },
-                () => [this.state.cols]
-            ) */
+            
         }
         toggle(i) {
             this.state.cols[i] = this.state.cols[i] === 0 ? 0xff : 0;
-            const hexs = this.state.cols.map(n => `0x${n.toString(16)}`)
+            const hexs = this.state.cols.map(n => `0x${n <= 0x0f? '0': '' }${n.toString(16)}`)
             vscode.postMessage({
                 type: 'line-modified',
                 index: this.state.lineIndex,
@@ -153,6 +140,13 @@
         setup() {
             const {data, ...etc} = this.props.anim;
             this.anim = useState({'sprites':data, ...etc});
+
+            useEffect(
+                () => {
+                    this.anim.sprites = this.props.anim.data;
+                },
+                () => [this.props.anim]
+            ) 
             // this.anim = useState(this.props.anim);
             // console.log('anim.anim:', this.anim)
             // this.env = useEnv();
@@ -167,6 +161,9 @@
         setup() {
             this.state = useState({ name: 'World' });
             this.env = useState(sprites);
+        }
+        get raw_anims(){
+            return JSON.stringify(this.env.anims)
         }
     }
 
@@ -245,7 +242,7 @@
 
                 // Then persist state information.
                 // This state is returned in the call to `vscode.getState` below when a webview is reloaded.
-                vscode.setState({ text, data });
+                // vscode.setState({ text, data });
 
                 return;
         }

@@ -53,7 +53,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 			webviewPanel.webview.postMessage({
 				type: 'update',
 				text: document.getText(),
-				vsdoc: document,
+				// vsdoc: document,
 				data: getData(),
 			});
 		}
@@ -104,14 +104,15 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 
 	private updatetDocumentLine(document: vscode.TextDocument, lineIndex: number, line:string) {
 		const edit = new vscode.WorkspaceEdit();
-		const range = document.positionAt(lineIndex);
+		const range = document.lineAt(lineIndex).range;
 		console.log('line-edit:', line, '@', lineIndex, 'range:',range);
 
 		// Just replace the entire document every time for this example extension.
 		// A more complete extension should compute minimal edits instead.
 		edit.replace(
 			document.uri,
-			new vscode.Range(lineIndex, 0, lineIndex, range.character),
+			// new vscode.Range(lineIndex, 0, lineIndex, range.character),
+			range,
 			// JSON.stringify(json, null, 2)
 			line
 		);
