@@ -28,11 +28,12 @@ owl.App.registerTemplate("Anim", function Anim(app, bdom, helpers
   let { prepareList, withKey } = helpers;
   const comp1 = app.createComponent(`Sprite`, true, false, false, false);
   
-  let block1 = createBlock(`<div class="greeter"><block-child-0/></div>`);
+  let block1 = createBlock(`<div class="greeter"><block-text-0/><block-child-0/></div>`);
   
   return function template(ctx, node, key = "") {
+    let txt1 = ctx['anim'].name;
     ctx = Object.create(ctx);
-    const [k_block2, v_block2, l_block2, c_block2] = prepareList(ctx['props'].lines);;
+    const [k_block2, v_block2, l_block2, c_block2] = prepareList(ctx['anim'].sprites);;
     for (let i1 = 0; i1 < l_block2; i1++) {
       ctx[`sprite`] = v_block2[i1];
       ctx[`sprite_index`] = i1;
@@ -40,7 +41,7 @@ owl.App.registerTemplate("Anim", function Anim(app, bdom, helpers
       c_block2[i1] = withKey(comp1({line: ctx['sprite']}, key + `__1__${key1}`, node, this, null), key1);
     }
     const b2 = list(c_block2);
-    return block1([], [b2]);
+    return block1([txt1], [b2]);
   }
 });
 
@@ -56,7 +57,7 @@ owl.App.registerTemplate("Root", function Root(app, bdom, helpers
     for (let i1 = 0; i1 < l_block1; i1++) {
       ctx[`anim`] = v_block1[i1];
       const key1 = ctx['anim'].name;
-      c_block1[i1] = withKey(comp1({name: ctx['anim'].name,lines: ctx['anim'].data}, key + `__1__${key1}`, node, this, null), key1);
+      c_block1[i1] = withKey(comp1({anim: ctx['anim']}, key + `__1__${key1}`, node, this, null), key1);
     }
     return list(c_block1);
   }

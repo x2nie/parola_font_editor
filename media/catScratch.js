@@ -124,7 +124,10 @@
         static template = "Anim"
 
         setup() {
-            this.state = useState({ name: 'World' });
+            const {data, ...etc} = this.props.anim;
+            this.anim = useState({'sprites':data, ...etc});
+            // this.anim = useState(this.props.anim);
+            // console.log('anim.anim:', this.anim)
             // this.env = useEnv();
         }
     }
@@ -176,13 +179,13 @@
      * Render the document in the webview. coy
      */
     function updateContent(/** @type {string} */ text, /** @type {object} */  data) {
+        console.log('data:', data)
         sprites.anims = data.anims;
         sprites.vars = data.vars;
         return;
         // const env = useEnv();
         // env.anims.state = data.anims;
         notesContainer.innerText = '';
-        console.log('data:', data)
         const vars = data.vars;
         data.anims.forEach(anim => {
 

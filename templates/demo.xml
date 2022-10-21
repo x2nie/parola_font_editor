@@ -6,14 +6,15 @@
   </div>
 
   <div t-name="Anim" class="greeter">
-	 <t t-foreach="props.lines" t-as="sprite" t-key="sprite_index">
+    <t t-esc="anim.name"/>
+	 <t t-foreach="anim.sprites" t-as="sprite" t-key="sprite_index">
           <Sprite line="sprite"/>
 	</t>
   </div>
 
   <t t-name="Root">
 	 <t t-foreach="env.anims" t-as="anim" t-key="anim.name">
-          <Anim name="anim.name" lines="anim.data" />
+          <Anim anim="anim" />
 	</t>
   </t>
 </templates>
