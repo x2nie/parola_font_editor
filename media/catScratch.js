@@ -5,107 +5,25 @@
     // @ts-ignore
     // In this implementation, we use the owl reactivity mechanism.
     const { Component, useState, mount, useRef, onPatched, onMounted, reactive, useEnv, useEffect } = owl;
+    const sprites = reactive({ anims: [], vars: {}, edit : {anim:-1, sprite:-1} }, () => console.log("changed"));
+    const ledSmall = {width: 7, padding:1}
+    const ledBig = {width: 15, padding:2}
 
-    // function useStore() {
-    //     const env = useEnv();
-    //     return useState(env.store);
-    // }
-
-    const sprites = reactive({ anims: [], vars: {} }, () => console.log("changed"));
-
-    //------------------------------------------------------------------------------
-    // Anim store
-    //------------------------------------------------------------------------------
-    /*
-    class AnimList {
-        constructor(anims) {
-            this.anims = anims || [];
-            const taskIds = this.anims.map((t) => t.id);
-            this.nextId = taskIds.length ? Math.max(...taskIds) + 1 : 1;
-        }
-
-        replaceAnims(anims) {
-            this.anims = anims
-            for (let index = 0; index < anims.length; index++) {
-                if (arr[index] === 'a') {
-                    arr[index] = 'z';
-                    break;
-                }
-            }
-        }
-
-        // addAnim(text) {
-        //     text = text.trim();
-        //     if (text) {
-        //         const anim = {
-        //             id: this.nextId++,
-        //             text: text,
-        //             isCompleted: false,
-        //         };
-        //         this.anims.push(anim);
-        //     }
-        // }
-
-        toggleAnim(anim) {
-            anim.isCompleted = !anim.isCompleted;
-        }
-
-        toggleAnim(id) {
-            const anim = this.anims.find(t => t.id === id);
-            anim.isCompleted = !anim.isCompleted;
-        }
-
-        toggleAll(value) {
-            for (let anim of this.anims) {
-                anim.isCompleted = value;
-            }
-        }
-
-        clearCompleted() {
-            const anims = this.anims.filter(t => t.isCompleted);
-            for (let anim of anims) {
-                this.deleteAnim(anim);
-            }
-        }
-
-        deleteAnim(id) {
-            const index = this.anims.findIndex((t) => t.id === id);
-            this.anims.splice(index, 1);
-        }
-
-        updateAnim(id, text) {
-            const value = text.trim();
-            if (!value) {
-                this.deleteAnim(id);
-            } else {
-                const anim = this.anims.find(t => t.id === id);
-                anim.text = value;
-            }
-        }
-    }
-
-    function createAnimStore() {
-        const saveAnims = () => localStorage.setItem("todoapp", JSON.stringify(taskStore.anims));
-        const initialAnims = JSON.parse(localStorage.getItem("todoapp") || "[]");
-        const taskStore = reactive(new AnimList(initialAnims), saveAnims);
-        saveAnims();
-        return taskStore;
-    }
-    */
-
+    
 
    
 
     const numberExp = /([0-9a-fA-Fx]+)/g;
-    const led = {width: 15, padding:2}
 
     class Sprite extends Component {
         static template = "Sprite"
 
         setup() {
             this.state = useState({ changing:true, lineIndex: -1, indent: 0, cols: [] });
-            this.att = useState({width: this.state.cols.length * led.width , 
-                height: 8 * led.width})
+            this.led = this.props.led === 'big'? ledBig : ledSmall;
+            this.pattern = this.props.led === 'big'? sprites.patternBig : sprites.patternSmall;
+            this.att = useState({width: this.state.cols.length * this.led.width , 
+                height: 8 * this.led.width})
             this.canvas = useRef('canvas')
             useEffect(
                 () => {
@@ -123,7 +41,7 @@
                     this.state.cols = numbers;
                     this.state.changing = false;
                     // this.draw();
-                    this.att.width = this.state.cols.length * led.width 
+                    this.att.width = this.state.cols.length * this.led.width 
                 },
                 () => [this.props.line]
             );
@@ -135,12 +53,6 @@
             );
         }
 
-        get att0(){
-            return {width: this.state.cols.length * led.width , 
-                    height: 8 * led.width}
-            return {width: `${this.state.cols.length * (led.width )}px`, 
-                    height: `${8 * (led.width)}px`}
-        }
 
         draw(){
             // @ts-check
@@ -155,13 +67,11 @@
             // ctx.fillStyle = ctx.createPattern(sprites.patternOff, "repeat");
             // ctx.fillRect(0, 0, canvas.width, canvas.height);
             // console.log('drawing canvas @:', canvas.width, canvas.height);
+            const ledWidth = this.led.width;
             this.state.cols.forEach((col, x) => {
                 for (let y = 0; y < 8; y++) {
-                    if(col & (1 << y)){
-                        ctx.drawImage(sprites.patternOn, x * led.width, y* led.width);
-                    } else {
-                        ctx.drawImage(sprites.patternOff, x * led.width, y* led.width);                        
-                    }
+                    const on = col & (1 << y)? 1 : 0;
+                    ctx.drawImage(this.pattern[on], x * ledWidth, y* ledWidth);
                 }
             });
                 
@@ -178,6 +88,7 @@
             });
         }
     }
+
 
     class Anim extends Component {
         static components = { Sprite };
@@ -201,11 +112,11 @@
 
     // Main root component
     class Root extends Component {
-        static components = { Anim };
+        static components = { Anim, Sprite };
         static template = "Root"
 
         setup() {
-            this.state = useState({ name: 'World' });
+            this.state = useState({ sample: {lineIndex:-1, line : "  0xff, 0x8f, 0x8f, 0x8f, 0x81, 0x81, 0x81, 0xff,"} });
             this.env = useState(sprites);
         }
         get raw_anims(){
@@ -216,6 +127,7 @@
 
     // Application setup
     
+    function drawPatterns(canvasId, led){
     function drawPattern(canvasId, turnOn){
         const canvas = /** @type {HTMLElement} */ document.getElementById(canvasId);
         // canvas.setAttribute('width', `${led.width}px`)
@@ -236,14 +148,19 @@
         context.fill();
         return canvas;
     }
-    sprites.patternOn = drawPattern('pat-on', true);
-    sprites.patternOff = drawPattern('pat-off', false);
+    return [
+        drawPattern(`${canvasId}-off`, false),
+        drawPattern(`${canvasId}-on`, true),
+    ]
+    }
+    sprites.patternSmall = drawPatterns('small-pat', ledSmall);
+    sprites.patternBig = drawPatterns('big-pat', ledBig);
     // const env = reactive({ a: 1 }, () => console.log("changed:",arguments));
     //------------------------------------------------------------------------------
     // App Initialization
     //------------------------------------------------------------------------------
     // const env = { store: createAnimStore(), anims: [], vars: {} };
-    mount(Root, document.body, {  dev: false });
+    mount(Root, document.body, {  dev: true });
 
 
     // Get a reference to the VS Code webview api.

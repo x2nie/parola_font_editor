@@ -1,27 +1,29 @@
-
 <templates>
-  <div t-name="Sprite" class="sprite">
-    <t t-esc="props.line.line"/>
-	<!-- <canvas t-ref="canvas" t-attf-width="#{att.width}px" t-attf-height="#{att.height}px"/> -->
-	<canvas t-ref="canvas"></canvas>
-	<t t-foreach="state.cols" t-as="col" t-key="col_index">
+	<div t-name="Sprite" class="sprite">
+		<!-- <t t-esc="props.line.line"/> -->
+		<!-- <canvas t-ref="canvas" t-attf-width="#{att.width}px" t-attf-height="#{att.height}px"/> -->
+		<canvas t-ref="canvas"></canvas>
+		<!-- <t t-foreach="state.cols" t-as="col" t-key="col_index">
 		<span t-raw="col" t-on-click="() => this.toggle(col_index)"/>
-	</t>
-  </div>
+	</t> -->
+	</div>
 
-  <div t-name="Anim" class="greeter">
-    <t t-esc="anim.name"/>
-	 <t t-foreach="anim.sprites" t-as="sprite" t-key="sprite_index">
-          <Sprite line="sprite"/>
-	</t>
-	<hr />
-  </div>
+	<div t-name="Anim" class="greeter">
+		<t t-esc="anim.name" />
+		<t t-foreach="anim.sprites" t-as="sprite" t-key="sprite_index">
+			<Sprite line="sprite" />
+		</t>
+		<hr />
+	</div>
 
-  <t t-name="Root">
-	ROOT:
-	<!-- <span t-raw="raw_anims" /> -->
-	 <t t-foreach="env.anims" t-as="anim" t-key="anim.name">
-          <Anim anim="anim" />
-	</t>
-  </t>
+	<div t-name="Root" class="app">
+		<div class="editor-area">
+			<Sprite led="'big'" line="state.sample" />
+		</div>
+		<div class="anims">
+			<t t-foreach="env.anims" t-as="anim" t-key="anim.name">
+				<Anim anim="anim" />
+			</t>
+		</div>
+	</div>
 </templates>

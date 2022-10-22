@@ -1,28 +1,15 @@
 owl.App.registerTemplate("Sprite", function Sprite(app, bdom, helpers
 ) {
   let { text, createBlock, list, multi, html, toggler, comment } = bdom;
-  let { prepareList, safeOutput, withKey } = helpers;
   
-  let block1 = createBlock(`<div class="sprite"><block-text-0/><!-- <canvas t-ref="canvas" t-attf-width="#{att.width}px" t-attf-height="#{att.height}px"/> --><canvas block-ref="1"/><block-child-0/></div>`);
-  let block3 = createBlock(`<span block-handler-0="click"><block-child-0/></span>`);
+  let block1 = createBlock(`<div class="sprite"><!-- <t t-esc="props.line.line"/> --><!-- <canvas t-ref="canvas" t-attf-width="#{att.width}px" t-attf-height="#{att.height}px"/> --><canvas block-ref="0"/><!-- <t t-foreach="state.cols" t-as="col" t-key="col_index">
+		<span t-raw="col" t-on-click="() => this.toggle(col_index)"/>
+	</t> --></div>`);
   
   return function template(ctx, node, key = "") {
     const refs = ctx.__owl__.refs;
     const ref1 = (el) => refs[`canvas`] = el;
-    let txt1 = ctx['props'].line.line;
-    ctx = Object.create(ctx);
-    const [k_block2, v_block2, l_block2, c_block2] = prepareList(ctx['state'].cols);;
-    for (let i1 = 0; i1 < l_block2; i1++) {
-      ctx[`col`] = v_block2[i1];
-      ctx[`col_index`] = i1;
-      const key1 = ctx['col_index'];
-      const v1 = ctx['col_index'];
-      let hdlr1 = [()=>this.toggle(v1), ctx];
-      const b4 = safeOutput(ctx['col']);
-      c_block2[i1] = withKey(block3([hdlr1], [b4]), key1);
-    }
-    const b2 = list(c_block2);
-    return block1([txt1, ref1], [b2]);
+    return block1([ref1]);
   }
 });
 
@@ -54,19 +41,21 @@ owl.App.registerTemplate("Root", function Root(app, bdom, helpers
 ) {
   let { text, createBlock, list, multi, html, toggler, comment } = bdom;
   let { prepareList, withKey } = helpers;
-  const comp1 = app.createComponent(`Anim`, true, false, false, false);
+  const comp1 = app.createComponent(`Sprite`, true, false, false, false);
+  const comp2 = app.createComponent(`Anim`, true, false, false, false);
+  
+  let block1 = createBlock(`<div class="app"><div class="editor-area"><block-child-0/></div><div class="anims"><block-child-1/></div></div>`);
   
   return function template(ctx, node, key = "") {
-    const b2 = text(` ROOT: `);
-    const b3 = comment(` <span t-raw="raw_anims" /> `);
+    const b2 = comp1({led: 'big',line: ctx['state'].sample}, key + `__1`, node, this, null);
     ctx = Object.create(ctx);
-    const [k_block4, v_block4, l_block4, c_block4] = prepareList(ctx['env'].anims);;
-    for (let i1 = 0; i1 < l_block4; i1++) {
-      ctx[`anim`] = v_block4[i1];
+    const [k_block3, v_block3, l_block3, c_block3] = prepareList(ctx['env'].anims);;
+    for (let i1 = 0; i1 < l_block3; i1++) {
+      ctx[`anim`] = v_block3[i1];
       const key1 = ctx['anim'].name;
-      c_block4[i1] = withKey(comp1({anim: ctx['anim']}, key + `__1__${key1}`, node, this, null), key1);
+      c_block3[i1] = withKey(comp2({anim: ctx['anim']}, key + `__2__${key1}`, node, this, null), key1);
     }
-    const b4 = list(c_block4);
-    return multi([b2, b3, b4]);
+    const b3 = list(c_block3);
+    return block1([], [b2, b3]);
   }
 });

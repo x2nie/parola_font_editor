@@ -4,6 +4,11 @@ body {
 	margin: 1em 2em;
 	/* background-image: url(./sand.jpg); */
 	background-repeat: repeat;
+	margin: 0;
+	padding: 0;
+}
+:root{
+	--input-margin-vertical:0;
 }
 
 body.vscode-dark {
@@ -11,10 +16,29 @@ body.vscode-dark {
 }
 
 .hidden-assets {
-	/* max-height: 0; */
+	max-height: 0;	
+	overflow: hidden;
 	background-color: yellow;
 }
-
+.app{
+	display: flex;
+	width: 100vw;
+	height: 100vh;
+}
+.editor-area{
+	flex-grow: 1;
+	padding: 10px 20px;
+}
+.anims {
+	height: 100vh;
+	overflow: auto;
+	padding: 10px 20px;
+}
+.anims .sprite {
+	padding: 4px;
+	background: black;
+	margin-bottom: 5px;
+}
 .notes {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, 100px);
@@ -52,6 +76,7 @@ body.vscode-dark {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	display: none;
 }
 
 .delete-button {
