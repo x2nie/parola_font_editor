@@ -30,14 +30,15 @@ owl.App.registerTemplate("Toolbox", function Toolbox(app, bdom, helpers
 ) {
   let { text, createBlock, list, multi, html, toggler, comment } = bdom;
   
-  let block1 = createBlock(`<div class="toolbox"><span title="Pencil" block-attribute-0="class" block-handler-1="click"/><span title="Erase" block-attribute-2="class" block-handler-3="click"/></div>`);
+  let block1 = createBlock(`<div class="toolbox"><span title="Pencil" block-attribute-0="class" block-handler-1="click">Pen</span><span title="Eraser" block-attribute-2="class" block-handler-3="click">Eraser</span><span block-handler-4="click">Clear</span></div>`);
   
   return function template(ctx, node, key = "") {
     let attr1 = `pencil on ${ctx['state'].pencilOn?'active':''}`;
     let hdlr1 = [()=>this.state.pencilOn=true, ctx];
     let attr2 = `pencil off ${!ctx['state'].pencilOn?'active':''}`;
     let hdlr2 = [()=>this.state.pencilOn=false, ctx];
-    return block1([attr1, hdlr1, attr2, hdlr2]);
+    let hdlr3 = [ctx['clear'], ctx];
+    return block1([attr1, hdlr1, attr2, hdlr2, hdlr3]);
   }
 });
 

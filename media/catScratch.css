@@ -73,21 +73,24 @@ body.vscode-dark {
 }
 .toolbox > .active {
 	background-color: var(--vscode-inputOption-activeBorder);
+	color: white;
 }
 .toolbox > *:hover {
 	background-color: var(--vscode-inputOption-hoverBackground);
 }
 /* .pencil {color:#444;} */
 /* .pencil.on {color:red;} */
-.pencil.off {color:black;}
-.pencil::after {
+.pencil::before {
 	content: '';
 	width: 11px;
 	height: 11px;
 	background: currentColor;
 	border-radius: 50%;
 	display: inline-block;
+	margin-right: 5px;
 }
+.pencil.on::before {background-color:var(--vscode-foreground);}
+.pencil.off::before {background-color:black;}
 
 .note:hover .delete-button {
 	display: block;

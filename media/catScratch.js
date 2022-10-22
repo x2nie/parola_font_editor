@@ -11,9 +11,6 @@
     const ledBig = {width: 15, padding:2}
 
     
-
-   
-
     const numberExp = /([0-9a-fA-Fx]+)/g;
 
     class Sprite extends Component {
@@ -98,8 +95,8 @@
         static template = "SpriteEditor"
 
         setup() {
-            this.lineEditing = sprites.editingLine
-            this.state = useState({ changing:true, drawing:false, code:'', lineIndex: sprites.editingLine, indent: 0, cols: [] });
+            // this.lineEditing = sprites.editingLine
+            this.state = useState({ changing:true, drawing:false, code:'', indent: 0, cols: [] });
             console.log('editor.code:', this.state.code, '@', this.props.line)
             this.led = this.props.led === 'big'? ledBig : ledSmall;
             this.pattern = this.props.led === 'big'? sprites.patternBig : sprites.patternSmall;
@@ -131,7 +128,7 @@
                     // this.draw();
                     this.att.width = this.state.cols.length * this.led.width ;
                 },
-                () => [this.props.line]
+                () => [this.props.line, sprites.version]
                 // () => [this.state.code]
                 // () => [this.lineEditing]
                 // () => [this.state.lineIndex]
@@ -186,10 +183,10 @@
             // const offsetY = current.top - ev.pageY;
             let x, y;
 
-            canvasEl.addEventListener("mousemove", moveWindow);
+            canvasEl.addEventListener("mousemove", switchLed);
             window.addEventListener("mouseup", stopDnD, { once: true });
 
-            function moveWindow(ev) {
+            function switchLed(ev) {
                 x = Math.floor(ev.offsetX/self.led.width);
                 y = Math.floor(ev.offsetY/self.led.width);
                 console.log('paint:',pencilOn,x, ',', y, self.state.cols.join(','))
@@ -201,37 +198,45 @@
                 self.draw()
             }
             function stopDnD() {
-                canvasEl.removeEventListener("mousemove", moveWindow);
+                canvasEl.removeEventListener("mousemove", switchLed);
                 // el.classList.remove('dragging');
 
                 // if (top !== undefined && left !== undefined) {
                 //     self.windowService.updatePosition(current.id, left, top);
                 // }
+                self.tellOuter()
             }
+
+            switchLed(ev); //first mouse down shall edit the led.
         }
+
 
         toggle(i) {
             this.state.cols[i] = this.state.cols[i] === 0 ? 0xff : 0;
             // this.draw();
+        }
+        tellOuter() {
+            //? tell vscode that the line has been modified.
             const hexs = this.state.cols.map(n => `0x${n <= 0x0f? '0': '' }${n.toString(16)}`)
             vscode.postMessage({
                 type: 'line-modified',
-                index: this.state.lineIndex,
+                index: Number(this.props.line),
                 data: `${' '.repeat(this.state.indent)}${hexs.join(', ')},`
             });
         }
     }
-
 
     class Toolbox extends Component {
         static template = "Toolbox"
 
         setup() {
             this.state = useState(drawingState);
+            this.env = useState(sprites);
         }
-        // setPencil(turn){
-        //     this.state.pencilOn = turn;
-        // }
+        clear() {
+            // this.states.cols = this.states.cols.map(()=>0);
+            directLineModify(this.env.editingLine, (n) => 0)
+        }
     }
 
     class Anim extends Component {
@@ -266,8 +271,35 @@
         get raw_anims(){
             return JSON.stringify(this.env.anims)
         }
+        get editorData(){
+            if(!Object.keys(this.env.codes).includes(`${this.env.editingLine}`)) {
+                console.log('no editing:' )
+                return '';
+            }
+            return this.env.codes[`${this.env.editingLine}`]
+
+        }
     }
 
+    function directLineModify(lineIndex, callback){
+        const line = sprites.codes[sprites.editingLine]
+        const indent = line.length - line.replace(/^\s+/, '').length;
+        const numbers = [];
+        let word;
+        while ((word = numberExp.exec(line))) {
+            const n = word[1];
+            numbers.push(callback(Number(n)));
+        }
+        // this.state.cols.splice(0, this.state.cols.length, numbers);
+        // this.state.cols = numbers;
+        //? tell vscode that the line has been modified.
+        const hexs = numbers.map(n => `0x${n <= 0x0f? '0': '' }${n.toString(16)}`)
+        vscode.postMessage({
+            type: 'line-modified',
+            index: Number(lineIndex),
+            data: `${' '.repeat(indent)}${hexs.join(', ')},`
+        });
+    }
 
     // Application setup
     
@@ -334,11 +366,12 @@
     /**
      * Render the document in the webview. coy
      */
-    function updateContent(/** @type {string} */ text, /** @type {object} */  data) {
+    function updateContent(/** @type {object} */  data) {
         console.log('data:', data)
         sprites.anims = data.anims;
         sprites.vars = data.vars;
         sprites.codes = data.codes;
+        sprites.version = data.version; //signal that sprites need to repaint
         if(!sprites.editingLine){
 
             console.log('sprites.editingLine :=', Object.keys(data.codes)[0])
@@ -353,11 +386,11 @@
         switch (message.type) {
             case 'update':
                 // console.log('data:',message.data)
-                const text = message.text;
+                // const text = message.text;
                 const data = message.data;
 
                 // Update our webview's content
-                updateContent(text, data);
+                updateContent(data);
 
                 // Then persist state information.
                 // This state is returned in the call to `vscode.getState` below when a webview is reloaded.

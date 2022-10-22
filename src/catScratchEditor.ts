@@ -52,9 +52,10 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 		function updateWebview() {
 			webviewPanel.webview.postMessage({
 				type: 'update',
-				text: document.getText(),
+				// text: document.getText(),
 				// vsdoc: document,
 				data: getData(),
+				// version: document.version,
 			});
 		}
 
@@ -103,6 +104,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 	}
 
 	private updatetDocumentLine(document: vscode.TextDocument, lineIndex: number, line:string) {
+		console.log('line-edit 1:', `"${line}"`, '@', lineIndex);
 		const edit = new vscode.WorkspaceEdit();
 		const range = document.lineAt(lineIndex).range;
 		console.log('line-edit:', line, '@', lineIndex, 'range:',range);
@@ -192,6 +194,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 			vars,
 			anims,
 			codes,
+			version: vsdoc.version
 		};
 	}
 

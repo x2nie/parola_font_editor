@@ -8,8 +8,9 @@
 	</div>
 
 	<div t-name="Toolbox" class="toolbox">
-		<span title="Pencil" t-on-click="() => this.state.pencilOn = true" t-attf-class="pencil on #{state.pencilOn ? 'active':''}"></span>
-		<span title="Eraser" t-on-click="() => this.state.pencilOn = false" t-attf-class="pencil off #{!state.pencilOn ? 'active':''}"></span>
+		<span title="Pencil" t-on-click="() => this.state.pencilOn = true" t-attf-class="pencil on #{state.pencilOn ? 'active':''}">Pen</span>
+		<span title="Eraser" t-on-click="() => this.state.pencilOn = false" t-attf-class="pencil off #{!state.pencilOn ? 'active':''}">Eraser</span>
+		<span t-on-click="clear">Clear</span>
 	</div>
 
 	<div t-name="Anim" class="greeter">
