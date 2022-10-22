@@ -11,6 +11,7 @@
 		<span title="Pencil" t-on-click="() => this.state.pencilOn = true" t-attf-class="pencil on #{state.pencilOn ? 'active':''}">Pen</span>
 		<span title="Eraser" t-on-click="() => this.state.pencilOn = false" t-attf-class="pencil off #{!state.pencilOn ? 'active':''}">Eraser</span>
 		<span t-on-click="clear">Clear</span>
+		<span t-on-click="invert">Invert</span>
 	</div>
 
 	<div t-name="Anim" class="greeter">

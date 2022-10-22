@@ -283,8 +283,10 @@
             this.env = useState(sprites);
         }
         clear() {
-            // this.states.cols = this.states.cols.map(()=>0);
-            directLineModify(this.env.editingLine, (n) => 0)
+            directLineModify(this.env.editingLine, () => 0)
+        }
+        invert() {
+            directLineModify(this.env.editingLine, (n) => ~n & 0xff)
         }
     }
 
