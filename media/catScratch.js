@@ -5,7 +5,7 @@
     // @ts-ignore
     // In this implementation, we use the owl reactivity mechanism.
     const { Component, useState, mount, useRef, onPatched, onMounted, reactive, useEnv, useEffect } = owl;
-    const sprites = reactive({ anims: [], vars: {}, codes:{}, editingLine: 0 }, (e) => console.log("changed:",e));
+    const sprites = reactive({ anims: [], vars: {}, codes:{}, editingLine: 0, nextEditingLine:0 }, (e) => console.log("changed:",e));
     const drawingState = reactive({ pencilOn: true }, (e) => console.log("changed:",e));
     const ledSmall = {width: 4, padding:0.5}
     const ledBig = {width: 15, padding:2}
@@ -237,7 +237,7 @@
             function switchLed(ev) {
                 x = Math.floor(ev.offsetX/self.led.width);
                 y = Math.floor(ev.offsetY/self.led.width);
-                console.log('paint:',pencilOn,x, ',', y, self.state.cols.join(','))
+                // console.log('paint:',pencilOn,x, ',', y, self.state.cols.join(','))
                 if(pencilOn)
                     self.state.cols[x] = self.state.cols[x] | (1 << y)
                 else
@@ -269,7 +269,7 @@
             vscode.postMessage({
                 type: 'line-modified',
                 // index: Number(this.props.line),
-                index: Number(sprite.editingLine),
+                index: Number(sprites.editingLine),
                 data: `${' '.repeat(this.state.indent)}${hexs.join(', ')},`
             });
         }
@@ -285,8 +285,29 @@
         clear() {
             directLineModify(this.env.editingLine, () => 0)
         }
+
         invert() {
             directLineModify(this.env.editingLine, (n) => ~n & 0xff)
+        }
+        flipV() {
+            function flip(n) {
+                let a = [];
+                for (let i = 0; i < 8; i++) {
+                    a.push( (n & (1 << i)) == 0 ? 0 : 1);
+                }
+                const bin = a.join('')
+                console.log('flipV a:',a, 'bin:',bin)
+                return parseInt(bin, 2)
+            }
+            directLineModify(this.env.editingLine, flip);
+        }
+        flipH(){
+            function flip(numbers){
+                const nums = [...numbers];
+                nums.reverse()
+                return nums;
+            }
+            directLineModify(this.env.editingLine, null, flip)
         }
     }
 
@@ -307,6 +328,18 @@
             // this.anim = useState(this.props.anim);
             // console.log('anim.anim:', this.anim)
             // this.env = useEnv();
+        }
+        add(){
+            const sprite = this.anim.sprites[this.anim.sprites.length-1];
+            const txt = sprite.line.replaceAll(/([0-9a-fA-F])/g,()=>'0')
+            const lineIndex = Number(sprite.lineIndex+1)
+            sprites.nextEditingLine = lineIndex;
+            // sprites.editingLine = lineIndex;
+            vscode.postMessage({
+                type: 'line-insert',
+                index: lineIndex,
+                data: txt,
+            });
         }
     }
 
@@ -332,19 +365,25 @@
         }
     }
 
-    function directLineModify(lineIndex, callback){
+    function directLineModify(lineIndex, columnCallback, finalCallback){
         const line = sprites.codes[sprites.editingLine]
         const indent = line.length - line.replace(/^\s+/, '').length;
-        const numbers = [];
+        let numbers = [];
         let word;
         while ((word = numberExp.exec(line))) {
-            const n = word[1];
-            numbers.push(callback(Number(n)));
+            let n = Number(word[1]);
+            if(columnCallback){
+                n = columnCallback(n)
+            }
+            numbers.push(n);
         }
         // this.state.cols.splice(0, this.state.cols.length, numbers);
         // this.state.cols = numbers;
-        //? tell vscode that the line has been modified.
+        if(finalCallback!=undefined){
+            numbers = finalCallback(numbers)
+        }
         const hexs = numbers.map(n => `0x${n <= 0x0f? '0': '' }${n.toString(16)}`)
+        //? tell vscode that the line has been modified.
         vscode.postMessage({
             type: 'line-modified',
             index: Number(lineIndex),
@@ -427,6 +466,10 @@
 
             console.log('sprites.editingLine :=', Object.keys(data.codes)[0])
             sprites.editingLine = Object.keys(data.codes)[0]
+        }
+        if(sprites.nextEditingLine){
+            sprites.editingLine = sprites.nextEditingLine;
+            sprites.nextEditingLine = 0;
         }
         return;
     }

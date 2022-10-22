@@ -22,8 +22,9 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 	}
 
 	private static readonly viewType = 'catCustoms.catScratch';
+	private lastLine = -1;
 
-	private static readonly scratchCharacters = ['😸', '😹', '😺', '😻', '😼', '😽', '😾', '🙀', '😿', '🐱'];
+	// private static readonly scratchCharacters = ['😸', '😹', '😺', '😻', '😼', '😽', '😾', '🙀', '😿', '🐱'];
 
 	constructor(
 		private readonly context: vscode.ExtensionContext
@@ -82,16 +83,20 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 		// Receive message from the webview.
 		webviewPanel.webview.onDidReceiveMessage(e => {
 			switch (e.type) {
-				case 'add':
-					this.addNewScratch(document);
-					return;
+				// case 'add':
+				// 	this.addNewScratch(document);
+				// 	return;
 
-				case 'delete':
-					this.deleteScratch(document, e.id);
-					return;
+				// case 'delete':
+				// 	this.deleteScratch(document, e.id);
+				// 	return;
 
 				case 'line-modified':
 					this.updatetDocumentLine(document, e.index, e.data);
+					return;
+
+				case 'line-insert':
+					this.insertDocumentLine(document, e.index, e.data);
 					return;
 
 				case 'firstload':
@@ -121,12 +126,31 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 
 		return vscode.workspace.applyEdit(edit);
 	}
+	private insertDocumentLine(document: vscode.TextDocument, lineIndex: number, line:string) {
+		// console.log('line-insert 1:', `"${line}"`, '@', lineIndex);
+		const edit = new vscode.WorkspaceEdit();
+		const range = document.lineAt(lineIndex).range.start;
+		console.log('line-insert:', line, '@', lineIndex, 'range:',range);
+		const eol = document.eol == 1 ? '\n' : '\r\n';
+
+		// Just replace the entire document every time for this example extension.
+		// A more complete extension should compute minimal edits instead.
+		edit.insert(
+			document.uri,
+			// new vscode.Range(lineIndex, 0, lineIndex, range.character),
+			range,
+			// JSON.stringify(json, null, 2)
+			line + eol,
+		);
+
+		return vscode.workspace.applyEdit(edit);
+	}
 
 	private getDataForWebview(vsdoc: vscode.TextDocument): object {
 		
 		
 		const text = vsdoc.getText();
-		let regEx = /const\s+uint8_t\s+PROGMEM\s(\w+)\s*\[(\w+)\s*\*\s*(\w+)\]/g;
+		let regEx = /const\s+uint8_t\s+PROGMEM\s+(\w+)\s*\[(\w+)\s*\*\s*(\w+)\]/g;
 		// console.log('vsdoc:',vsdoc)
 		const eol = vsdoc.eol == 1 ? '\n' : '\r\n';
 		const lines = text.split(eol);
@@ -148,6 +172,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 				ret.push(lineText);
 				i++;
 			}
+			this.lastLine = i;
 
 			return ret;
 		};
@@ -267,34 +292,34 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 	/**
 	 * Add a new scratch to the current document.
 	 */
-	private addNewScratch(document: vscode.TextDocument) {
-		const json = this.getDocumentAsJson(document);
-		const character = CatScratchEditorProvider.scratchCharacters[Math.floor(Math.random() * CatScratchEditorProvider.scratchCharacters.length)];
-		json.scratches = [
-			...(Array.isArray(json.scratches) ? json.scratches : []),
-			{
-				id: getNonce(),
-				text: character,
-				created: Date.now(),
-			}
-		];
+	// private addNewScratch(document: vscode.TextDocument) {
+	// 	const json = this.getDocumentAsJson(document);
+	// 	const character = CatScratchEditorProvider.scratchCharacters[Math.floor(Math.random() * CatScratchEditorProvider.scratchCharacters.length)];
+	// 	json.scratches = [
+	// 		...(Array.isArray(json.scratches) ? json.scratches : []),
+	// 		{
+	// 			id: getNonce(),
+	// 			text: character,
+	// 			created: Date.now(),
+	// 		}
+	// 	];
 
-		return this.updateTextDocument(document, json);
-	}
+	// 	return this.updateTextDocument(document, json);
+	// }
 
 	/**
 	 * Delete an existing scratch from a document.
 	 */
-	private deleteScratch(document: vscode.TextDocument, id: string) {
-		const json = this.getDocumentAsJson(document);
-		if (!Array.isArray(json.scratches)) {
-			return;
-		}
+	// private deleteScratch(document: vscode.TextDocument, id: string) {
+	// 	const json = this.getDocumentAsJson(document);
+	// 	if (!Array.isArray(json.scratches)) {
+	// 		return;
+	// 	}
 
-		json.scratches = json.scratches.filter((note: any) => note.id !== id);
+	// 	json.scratches = json.scratches.filter((note: any) => note.id !== id);
 
-		return this.updateTextDocument(document, json);
-	}
+	// 	return this.updateTextDocument(document, json);
+	// }
 
 	/**
 	 * Try to get a current document as json text.

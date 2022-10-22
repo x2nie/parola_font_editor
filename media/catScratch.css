@@ -55,12 +55,13 @@ body.vscode-dark {
 	padding: 4px;
 	margin-bottom: 1em;
     font-size: 12px;
-    display: flex;
+    display: inline-flex;
+	margin-right: 6px;
 }
 .toolbox > * {
 	min-width: 22px;
     height: 22px;
-    padding: 3px;
+    padding: 3px 5px;
     border-radius: 5px;
     flex: initial;
     margin-left: 3px;
