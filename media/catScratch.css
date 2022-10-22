@@ -35,7 +35,12 @@ body.vscode-dark {
 .anims {
 	height: 100vh;
 	overflow: auto;
-	padding: 10px 20px;
+	padding: 10px;
+}
+.minimap-shadow{
+	height: 100vh;
+	box-shadow: #000000 -6px 0 6px -6px inset;
+	width: 6px;
 }
 .anims .sprite {
 	padding: 4px;
@@ -43,55 +48,45 @@ body.vscode-dark {
 	margin-bottom: 5px;
 	cursor: pointer;
 }
-.notes {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, 100px);
-	grid-template-rows: repeat(auto-fill, 100px);
-	grid-gap: 2em;
-	justify-content: center;
-}
 
-.note {
-	display: flex;
-	flex-direction: column;
-	border-radius: 5px;
-	background-color: var(--vscode-editor-background);
-	text-align: center;
-	padding: 0.6em;
-	position: relative;
-	overflow: hidden;
+/* TOOLBOX */
+.toolbox {
+	background-color: var(--vscode-dropdown-background);
+	padding: 4px;
+	margin-bottom: 1em;
+    font-size: 12px;
+    display: flex;
 }
-
-.note .text {
-	flex: 1;
-	font-size: 3em;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+.toolbox > * {
+	min-width: 22px;
+    height: 22px;
+    padding: 3px;
+    border-radius: 5px;
+    flex: initial;
+    margin-left: 3px;
+    /* background-position: 50%; */
+    /* background-repeat: no-repeat; */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-
-.note .created {
-	font-style: italic;
-	font-size: 0.75em;
+.toolbox > .active {
+	background-color: var(--vscode-inputOption-activeBorder);
 }
-
-.add-button {
-	height: 100px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	display: none;
+.toolbox > *:hover {
+	background-color: var(--vscode-inputOption-hoverBackground);
 }
-
-.delete-button {
-	position: absolute;
-	top: 0;
-	right: 0;
-	display: none;
-}
-
-.delete-button:before {
-	content: 'delete';
+/* .pencil {color:#444;} */
+/* .pencil.on {color:red;} */
+.pencil.off {color:black;}
+.pencil::after {
+	content: '';
+	width: 11px;
+	height: 11px;
+	background: currentColor;
+	border-radius: 50%;
+	display: inline-block;
 }
 
 .note:hover .delete-button {

@@ -250,9 +250,9 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 					<canvas id="big-pat-on"></canvas>
 					<canvas id="big-pat-off"></canvas>
 				</div>
-					<div class="add-button">
+					<!-- <div class="add-button">
 						<button>Scratch!</button>
-					</div>
+					</div> -->
 				
 				<script nonce="${nonce}" src="${owlUri}"></script>
 				<script nonce="${nonce}" src="${owlTemplateUri}"></script>

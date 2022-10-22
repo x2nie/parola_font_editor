@@ -6,7 +6,8 @@
     // In this implementation, we use the owl reactivity mechanism.
     const { Component, useState, mount, useRef, onPatched, onMounted, reactive, useEnv, useEffect } = owl;
     const sprites = reactive({ anims: [], vars: {}, codes:{}, editingLine: 0 }, (e) => console.log("changed:",e));
-    const ledSmall = {width: 7, padding:1}
+    const drawingState = reactive({ pencilOn: true }, (e) => console.log("changed:",e));
+    const ledSmall = {width: 4, padding:0.5}
     const ledBig = {width: 15, padding:2}
 
     
@@ -171,9 +172,11 @@
 
         startDrawing(ev) {
             console.log('mouse-down.ev:',ev)
+            if(ev.button != 0) return;
             const self = this;
             const canvasEl = this.canvas.el;
-            const pencilOn = ev.button == 0; // buttonLeft = draw, buttonRight = erase
+            const pencilOn = drawingState.pencilOn; // buttonLeft = draw, buttonRight = erase
+            // const pencilOn = ev.button == 0; // buttonLeft = draw, buttonRight = erase
 
             // const el = root.el;
             // el.classList.add('dragging');
@@ -220,6 +223,17 @@
     }
 
 
+    class Toolbox extends Component {
+        static template = "Toolbox"
+
+        setup() {
+            this.state = useState(drawingState);
+        }
+        // setPencil(turn){
+        //     this.state.pencilOn = turn;
+        // }
+    }
+
     class Anim extends Component {
         static components = { Sprite };
         static template = "Anim"
@@ -242,7 +256,7 @@
 
     // Main root component
     class Root extends Component {
-        static components = { Anim, Sprite, SpriteEditor };
+        static components = { Anim, Sprite, SpriteEditor, Toolbox };
         static template = "Root"
 
         setup() {
@@ -304,18 +318,18 @@
     // const cvPatOff = /** @type {HTMLElement} */ (document.getElementById('pat-off'));
 
 
-    const addButtonContainer = document.querySelector('.add-button');
-    // @ts-ignore
-    addButtonContainer.querySelector('button').addEventListener('click', () => {
-        vscode.postMessage({
-            type: 'add'
-        });
-    })
+    // const addButtonContainer = document.querySelector('.add-button');
+    // // @ts-ignore
+    // addButtonContainer.querySelector('button').addEventListener('click', () => {
+    //     vscode.postMessage({
+    //         type: 'add'
+    //     });
+    // })
 
-    const errorContainer = document.createElement('div');
-    document.body.appendChild(errorContainer);
-    errorContainer.className = 'error'
-    errorContainer.style.display = 'none'
+    // const errorContainer = document.createElement('div');
+    // document.body.appendChild(errorContainer);
+    // errorContainer.className = 'error'
+    // errorContainer.style.display = 'none'
 
     /**
      * Render the document in the webview. coy

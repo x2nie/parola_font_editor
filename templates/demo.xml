@@ -7,6 +7,11 @@
 		<canvas t-ref="canvas" t-on-mousedown.prevent="startDrawing"></canvas>
 	</div>
 
+	<div t-name="Toolbox" class="toolbox">
+		<span title="Pencil" t-on-click="() => this.state.pencilOn = true" t-attf-class="pencil on #{state.pencilOn ? 'active':''}"></span>
+		<span title="Eraser" t-on-click="() => this.state.pencilOn = false" t-attf-class="pencil off #{!state.pencilOn ? 'active':''}"></span>
+	</div>
+
 	<div t-name="Anim" class="greeter">
 		<t t-esc="anim.name" />
 		<t t-foreach="anim.sprites" t-as="sprite" t-key="sprite_index">
@@ -17,8 +22,10 @@
 
 	<div t-name="Root" class="app">
 		<div class="editor-area">
+			<Toolbox/>
 			<SpriteEditor led="'big'" line="env.editingLine" />
 		</div>
+		<div class="minimap-shadow"></div>
 		<div class="anims">
 			<t t-foreach="env.anims" t-as="anim" t-key="anim.name">
 				<Anim anim="anim" />
