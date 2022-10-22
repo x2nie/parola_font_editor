@@ -5,7 +5,7 @@
     // @ts-ignore
     // In this implementation, we use the owl reactivity mechanism.
     const { Component, useState, mount, useRef, onPatched, onMounted, reactive, useEnv, useEffect } = owl;
-    const sprites = reactive({ anims: [], vars: {}, edit : {anim:-1, sprite:-1} }, () => console.log("changed"));
+    const sprites = reactive({ anims: [], vars: {}, codes:{}, editingLine: 0 }, (e) => console.log("changed:",e));
     const ledSmall = {width: 7, padding:1}
     const ledBig = {width: 15, padding:2}
 
@@ -77,6 +77,98 @@
                 
         }
 
+        selectme() {
+            sprites.editingLine = this.state.lineIndex;
+        }
+
+        toggle(i) {
+            this.state.cols[i] = this.state.cols[i] === 0 ? 0xff : 0;
+            // this.draw();
+            const hexs = this.state.cols.map(n => `0x${n <= 0x0f? '0': '' }${n.toString(16)}`)
+            vscode.postMessage({
+                type: 'line-modified',
+                index: this.state.lineIndex,
+                data: `${' '.repeat(this.state.indent)}${hexs.join(', ')},`
+            });
+        }
+    }
+
+    class SpriteEditor extends Component {
+        static template = "SpriteEditor"
+
+        setup() {
+            this.lineEditing = sprites.editingLine
+            this.state = useState({ changing:true, code:'', lineIndex: sprites.editingLine, indent: 0, cols: [] });
+            console.log('editor.code:', this.state.code, '@', this.props.line)
+            this.led = this.props.led === 'big'? ledBig : ledSmall;
+            this.pattern = this.props.led === 'big'? sprites.patternBig : sprites.patternSmall;
+            this.att = useState({width: this.state.cols.length * this.led.width , 
+                height: 8 * this.led.width})
+            this.canvas = useRef('canvas')
+            useEffect(
+                () => {
+                    // if(!Object.keys(sprites.codes).includes(sprites.editingLine)) {
+                    if(!Object.keys(sprites.codes).includes(`${this.props.line}`)) {
+                        console.log('no editing:', Object.keys(sprites.codes), '@', this.props.line )
+                        return;
+                    }
+                    this.state.changing = true;
+                    const line = sprites.codes[`${this.props.line}`];
+                    // const line = this.state.code;
+                    console.log('editor.line:', line)
+                    // this.state.lineIndex = this.props.line.lineIndex;
+                    this.state.indent = line.length - line.replace(/^\s+/, '').length;
+                    const numbers = [];
+                    let word;
+                    while ((word = numberExp.exec(line))) {
+                        const n = word[1];
+                        numbers.push(Number(n));
+                    }
+                    // this.state.cols.splice(0, this.state.cols.length, numbers);
+                    this.state.cols = numbers;
+                    this.state.changing = false;
+                    // this.draw();
+                    this.att.width = this.state.cols.length * this.led.width ;
+                },
+                () => [this.props.line]
+                // () => [this.state.code]
+                // () => [this.lineEditing]
+                // () => [this.state.lineIndex]
+                // () => [sprites.editingLine, this.lineEditing, this.state.lineEditing]
+            );
+            useEffect(
+                () => {                    
+                    this.draw();
+                },
+                () => [this.att, this.state.cols]
+            );
+        }
+
+
+        draw(){
+            // @ts-check
+            // return;
+
+            // console.log('canvas:', this.canvas);
+            if(!this.canvas.el) return;
+            let canvas = /** @type {HTMLCanvasElement} */ this.canvas.el;
+            canvas.width = this.att.width;
+            canvas.height = this.att.height;
+            const ctx = canvas.getContext("2d");
+            // ctx.fillStyle = "#FF0000";
+            // ctx.fillStyle = ctx.createPattern(sprites.patternOff, "repeat");
+            // ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // console.log('drawing canvas @:', canvas.width, canvas.height);
+            const ledWidth = this.led.width;
+            this.state.cols.forEach((col, x) => {
+                for (let y = 0; y < 8; y++) {
+                    const on = col & (1 << y)? 1 : 0;
+                    ctx.drawImage(this.pattern[on], x * ledWidth, y* ledWidth);
+                }
+            });
+                
+        }
+
         toggle(i) {
             this.state.cols[i] = this.state.cols[i] === 0 ? 0xff : 0;
             // this.draw();
@@ -112,7 +204,7 @@
 
     // Main root component
     class Root extends Component {
-        static components = { Anim, Sprite };
+        static components = { Anim, Sprite, SpriteEditor };
         static template = "Root"
 
         setup() {
@@ -194,6 +286,12 @@
         console.log('data:', data)
         sprites.anims = data.anims;
         sprites.vars = data.vars;
+        sprites.codes = data.codes;
+        if(!sprites.editingLine){
+
+            console.log('sprites.editingLine :=', Object.keys(data.codes)[0])
+            sprites.editingLine = Object.keys(data.codes)[0]
+        }
         return;
     }
 

@@ -121,8 +121,8 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 	}
 
 	private getDataForWebview(vsdoc: vscode.TextDocument): object {
-		const anims : Array<object> = [];
-		const vars : {[key:string] : any} = {};
+		
+		
 		const text = vsdoc.getText();
 		let regEx = /const\s+uint8_t\s+PROGMEM\s(\w+)\s*\[(\w+)\s*\*\s*(\w+)\]/g;
 		// console.log('vsdoc:',vsdoc)
@@ -130,8 +130,8 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 		const lines = text.split(eol);
 		const linesCount = lines.length;
 
-		const getMatrix = (lineIndex:number):object[] => {
-			const ret:object[] = [];
+		const getMatrix = (lineIndex:number):{lineIndex:number, line:string}[] => {
+			const ret:{lineIndex:number, line:string}[] = [];
 
 			let i = lineIndex;
 			while(i < linesCount && !lines[i].startsWith('}')) {
@@ -149,21 +149,30 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 
 			return ret;
 		};
+
+		const anims : Array<object> = [];
+		const codes : {[key:number]:string} ={};
 		let word;
 		while ((word = regEx.exec(text))) {
 			const startPos = vsdoc.positionAt(word.index);
 			// line = lines[startPos.line+2];
+			const data = getMatrix(startPos.line +1);
+			data.forEach(code => {
+				codes[code.lineIndex] = code.line;
+			});
 			const ani = {
 				name: word[1],
 				heightVar: word[2],
 				widthVar: word[3],
-				data : getMatrix(startPos.line +1),
+				data,
 			};
 			anims.push(ani);
 
 			//array
 		}
+
 		// VARS
+		const vars : {[key:string] : any} = {};
 		regEx = /const\s+uint8_t\s+(\w+)\s*=\s*([0-9a-fA-Fx]+)\s*;/g;
 		while ((word = regEx.exec(text))) {
 			// console.log('var:',word);
@@ -181,7 +190,8 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 
 		return {
 			vars,
-			anims
+			anims,
+			codes,
 		};
 	}
 

@@ -1,11 +1,10 @@
 <templates>
-	<div t-name="Sprite" class="sprite">
-		<!-- <t t-esc="props.line.line"/> -->
-		<!-- <canvas t-ref="canvas" t-attf-width="#{att.width}px" t-attf-height="#{att.height}px"/> -->
+	<div t-name="Sprite" class="sprite" t-on-click="selectme">
+		<canvas t-ref="canvas" ></canvas>
+	</div>
+
+	<div t-name="SpriteEditor" class="sprite">
 		<canvas t-ref="canvas"></canvas>
-		<!-- <t t-foreach="state.cols" t-as="col" t-key="col_index">
-		<span t-raw="col" t-on-click="() => this.toggle(col_index)"/>
-	</t> -->
 	</div>
 
 	<div t-name="Anim" class="greeter">
@@ -18,7 +17,7 @@
 
 	<div t-name="Root" class="app">
 		<div class="editor-area">
-			<Sprite led="'big'" line="state.sample" />
+			<SpriteEditor led="'big'" line="env.editingLine" />
 		</div>
 		<div class="anims">
 			<t t-foreach="env.anims" t-as="anim" t-key="anim.name">
