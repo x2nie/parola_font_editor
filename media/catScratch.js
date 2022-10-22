@@ -106,6 +106,54 @@
             useEffect(
                 () => {
                     // if(!Object.keys(sprites.codes).includes(sprites.editingLine)) {
+                    // if(!Object.keys(sprites.codes).includes(`${this.props.line}`)) {
+                    //     console.log('no editing:', Object.keys(sprites.codes), '@', this.props.line )
+                    //     return;
+                    // }
+                    // this.state.changing = true;
+                    // const line = sprites.codes[`${this.props.line}`];
+                    const line = this.props.line;
+                    console.log('editor.line:', line)
+                    // this.state.lineIndex = this.props.line.lineIndex;
+                    this.state.indent = line.length - line.replace(/^\s+/, '').length;
+                    const numbers = [];
+                    let word;
+                    while ((word = numberExp.exec(line))) {
+                        const n = word[1];
+                        numbers.push(Number(n));
+                    }
+                    // this.state.cols.splice(0, this.state.cols.length, numbers);
+                    this.state.cols = numbers;
+                    // this.state.changing = false;
+                    // this.draw();
+                    this.att.width = this.state.cols.length * this.led.width ;
+                },
+                () => [this.props.line]
+                // () => [this.props.line, sprites.version]
+                // () => [this.state.code]
+                // () => [this.lineEditing]
+                // () => [this.state.lineIndex]
+                // () => [sprites.editingLine, this.lineEditing, this.state.lineEditing]
+            );
+            useEffect(
+                () => {                    
+                    this.draw();
+                },
+                () => [this.att, this.state.cols]
+            );
+        }
+        setup0() {
+            // this.lineEditing = sprites.editingLine
+            this.state = useState({ changing:true, drawing:false, code:'', indent: 0, cols: [] });
+            console.log('editor.code:', this.state.code, '@', this.props.line)
+            this.led = this.props.led === 'big'? ledBig : ledSmall;
+            this.pattern = this.props.led === 'big'? sprites.patternBig : sprites.patternSmall;
+            this.att = useState({width: this.state.cols.length * this.led.width , 
+                height: 8 * this.led.width})
+            this.canvas = useRef('canvas')            
+            useEffect(
+                () => {
+                    // if(!Object.keys(sprites.codes).includes(sprites.editingLine)) {
                     if(!Object.keys(sprites.codes).includes(`${this.props.line}`)) {
                         console.log('no editing:', Object.keys(sprites.codes), '@', this.props.line )
                         return;
@@ -220,7 +268,8 @@
             const hexs = this.state.cols.map(n => `0x${n <= 0x0f? '0': '' }${n.toString(16)}`)
             vscode.postMessage({
                 type: 'line-modified',
-                index: Number(this.props.line),
+                // index: Number(this.props.line),
+                index: Number(sprite.editingLine),
                 data: `${' '.repeat(this.state.indent)}${hexs.join(', ')},`
             });
         }

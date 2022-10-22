@@ -78,7 +78,7 @@ owl.App.registerTemplate("Root", function Root(app, bdom, helpers
   
   return function template(ctx, node, key = "") {
     const b2 = comp1({}, key + `__1`, node, this, null);
-    const b3 = comp2({led: 'big',line: ctx['env'].editingLine}, key + `__2`, node, this, null);
+    const b3 = comp2({led: 'big',line: ctx['editorData']}, key + `__2`, node, this, null);
     ctx = Object.create(ctx);
     const [k_block4, v_block4, l_block4, c_block4] = prepareList(ctx['env'].anims);;
     for (let i1 = 0; i1 < l_block4; i1++) {

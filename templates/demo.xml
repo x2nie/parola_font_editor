@@ -24,7 +24,7 @@
 	<div t-name="Root" class="app">
 		<div class="editor-area">
 			<Toolbox/>
-			<SpriteEditor led="'big'" line="env.editingLine" />
+			<SpriteEditor led="'big'" line="editorData" />
 		</div>
 		<div class="minimap-shadow"></div>
 		<div class="anims">
