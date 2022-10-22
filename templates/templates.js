@@ -16,12 +16,13 @@ owl.App.registerTemplate("SpriteEditor", function SpriteEditor(app, bdom, helper
 ) {
   let { text, createBlock, list, multi, html, toggler, comment } = bdom;
   
-  let block1 = createBlock(`<div class="sprite"><canvas block-ref="0"/></div>`);
+  let block1 = createBlock(`<div class="sprite"><canvas block-handler-0="mousedown.prevent" block-ref="1"/></div>`);
   
   return function template(ctx, node, key = "") {
     const refs = ctx.__owl__.refs;
     const ref1 = (el) => refs[`canvas`] = el;
-    return block1([ref1]);
+    let hdlr1 = ["prevent", ctx['startDrawing'], ctx];
+    return block1([hdlr1, ref1]);
   }
 });
 

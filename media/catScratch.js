@@ -98,13 +98,13 @@
 
         setup() {
             this.lineEditing = sprites.editingLine
-            this.state = useState({ changing:true, code:'', lineIndex: sprites.editingLine, indent: 0, cols: [] });
+            this.state = useState({ changing:true, drawing:false, code:'', lineIndex: sprites.editingLine, indent: 0, cols: [] });
             console.log('editor.code:', this.state.code, '@', this.props.line)
             this.led = this.props.led === 'big'? ledBig : ledSmall;
             this.pattern = this.props.led === 'big'? sprites.patternBig : sprites.patternSmall;
             this.att = useState({width: this.state.cols.length * this.led.width , 
                 height: 8 * this.led.width})
-            this.canvas = useRef('canvas')
+            this.canvas = useRef('canvas')            
             useEffect(
                 () => {
                     // if(!Object.keys(sprites.codes).includes(sprites.editingLine)) {
@@ -167,6 +167,44 @@
                 }
             });
                 
+        }
+
+        startDrawing(ev) {
+            console.log('mouse-down.ev:',ev)
+            const self = this;
+            const canvasEl = this.canvas.el;
+            const pencilOn = ev.button == 0; // buttonLeft = draw, buttonRight = erase
+
+            // const el = root.el;
+            // el.classList.add('dragging');
+
+            // const current = this.props.info;
+            // const offsetX = current.left - ev.pageX;
+            // const offsetY = current.top - ev.pageY;
+            let x, y;
+
+            canvasEl.addEventListener("mousemove", moveWindow);
+            window.addEventListener("mouseup", stopDnD, { once: true });
+
+            function moveWindow(ev) {
+                x = Math.floor(ev.offsetX/self.led.width);
+                y = Math.floor(ev.offsetY/self.led.width);
+                console.log('paint:',pencilOn,x, ',', y, self.state.cols.join(','))
+                if(pencilOn)
+                    self.state.cols[x] = self.state.cols[x] | (1 << y)
+                else
+                    self.state.cols[x] = self.state.cols[x] & ~(1 << y);
+                // self.state.cols[x] = 0xff
+                self.draw()
+            }
+            function stopDnD() {
+                canvasEl.removeEventListener("mousemove", moveWindow);
+                // el.classList.remove('dragging');
+
+                // if (top !== undefined && left !== undefined) {
+                //     self.windowService.updatePosition(current.id, left, top);
+                // }
+            }
         }
 
         toggle(i) {

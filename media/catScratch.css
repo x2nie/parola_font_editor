@@ -29,6 +29,9 @@ body.vscode-dark {
 	flex-grow: 1;
 	padding: 10px 20px;
 }
+.editor-area canvas {
+	cursor: crosshair;
+}
 .anims {
 	height: 100vh;
 	overflow: auto;
