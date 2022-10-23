@@ -334,6 +334,26 @@
                 type: 'new-anim',
             });
         }
+        appendColumn(){
+            function append(numbers){
+                const nums = [...numbers, 0x00];
+                return nums;
+            }
+            const config = buildConfig('W', +1)
+            directLinesModify(currentAnimLineIds(), null, append, config)
+        }
+
+        popColumn(){
+            function pop(numbers){
+                const nums = [...numbers];
+                nums.pop()
+                return nums;
+            }
+            const config = buildConfig('W', -1)
+            directLinesModify(currentAnimLineIds(), null, pop, config)
+        }
+
+
     }
 
     class Anim extends Component {
@@ -397,7 +417,7 @@
         }
     }
 
-    function directLineModify(lineIndex, columnCallback, finalCallback){
+    function directLineModify(lineIndex, columnCallback, finalCallback, config){
         const line = sprites.codes[sprites.editingLine]
         const indent = line.length - line.replace(/^\s+/, '').length;
         let numbers = [];
@@ -419,8 +439,62 @@
         vscode.postMessage({
             type: 'line-modified',
             index: Number(lineIndex),
-            data: `${' '.repeat(indent)}${hexs.join(', ')},`
+            data: `${' '.repeat(indent)}${hexs.join(', ')},`,
+            config,
         });
+    }
+
+    function directLinesModify(lineIds, columnCallback, finalCallback, config){
+        console.log('directLinesModify:', arguments)
+        const data = lineIds.map(lineIndex => {            
+            const line = sprites.codes[lineIndex]
+            const indent = line.length - line.replace(/^\s+/, '').length;
+            let numbers = [];
+            let word;
+            while ((word = numberExp.exec(line))) {
+                let n = Number(word[1]);
+                if(columnCallback){
+                    n = columnCallback(n)
+                }
+                numbers.push(n);
+            }
+            // this.state.cols.splice(0, this.state.cols.length, numbers);
+            // this.state.cols = numbers;
+            if(finalCallback!=undefined){
+                numbers = finalCallback(numbers)
+            }
+            const hexs = numbers.map(n => `0x${n <= 0x0f? '0': '' }${n.toString(16)}`);
+            return {
+                lineIndex,
+                lineText: `${' '.repeat(indent)}${hexs.join(', ')},`,
+            }
+        });
+        //? tell vscode that the line has been modified.
+        vscode.postMessage({
+            type: 'lines-modified',
+            data,
+            config,
+        });
+    }
+
+    /**
+     * Create a config to update the animation config 
+     * @param {char} W_or_F width or framee
+     * @param {number} count Amount of increment/decrement (+/-)
+     */
+    function buildConfig(W_or_F, count){
+        const currentAnim = sprites.anims[ sprites.editingAnim ]
+        const varName = W_or_F == 'F' ? currentAnim['framesVar'] : currentAnim['widthVar'];
+        const config = sprites.vars[varName];
+        return {
+            lineIndex : config.lineIndex,
+            value : Number(config.value) + count
+        }
+    }
+
+    function currentAnimLineIds(){
+        const currentAnim = sprites.anims[ sprites.editingAnim ]
+        return currentAnim.data.map(line => line.lineIndex)
     }
 
     // Application setup

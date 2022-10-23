@@ -1,6 +1,14 @@
 import * as vscode from 'vscode';
 import { getNonce } from './util';
 
+interface SpriteConfig {
+	lineIndex: number,
+	value : number,
+}
+interface LineData {
+	lineIndex: number,
+	lineText: string,
+}
 /**
  * Provider for cat scratch editors.
  * 
@@ -92,7 +100,11 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 					return;
 
 				case 'line-modified':
-					this.updatetDocumentLine(document, e.index, e.data);
+					this.updatetDocumentLine(document, e.index, e.data, e.config);
+					return;
+
+				case 'lines-modified':
+					this.updateDocumentLines(document, e.data, e.config);
 					return;
 
 				case 'line-insert':
@@ -111,7 +123,20 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 		// updateWebview();
 	}
 
-	private updatetDocumentLine(document: vscode.TextDocument, lineIndex: number, line:string) {
+	private updateAnimConfig(document: vscode.TextDocument, edit: vscode.WorkspaceEdit, config:SpriteConfig) {
+		console.log('config:', config);
+		const textLine = document.lineAt(config.lineIndex);
+		const regEx = /=\s*([0-9a-fA-Fx]+)\s*;/;
+		const line = textLine.text.replace(regEx, `= ${config.value};`);
+
+		edit.replace(
+			document.uri,
+			textLine.range,
+			line
+		);
+	}
+
+	private updatetDocumentLine(document: vscode.TextDocument, lineIndex: number, line:string, config:SpriteConfig|undefined) {
 		// console.log('line-edit 1:', `"${line}"`, '@', lineIndex);
 		const edit = new vscode.WorkspaceEdit();
 		const range = document.lineAt(lineIndex).range;
@@ -126,6 +151,31 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 			// JSON.stringify(json, null, 2)
 			line
 		);
+
+		if(config){
+			this.updateAnimConfig(document, edit, config);
+		}
+
+		return vscode.workspace.applyEdit(edit);
+	}
+
+	private updateDocumentLines(document: vscode.TextDocument, data: LineData[], config:SpriteConfig|undefined) {
+		console.log('lines-edit data:', `"${data}"`, '@', config);
+		const edit = new vscode.WorkspaceEdit();
+
+		data.forEach(lineData => {
+
+			const range = document.lineAt(lineData.lineIndex).range;
+			edit.replace(
+				document.uri,
+				range,
+				lineData.lineText
+			);
+		});
+
+		if(config){
+			this.updateAnimConfig(document, edit, config);
+		}
 
 		return vscode.workspace.applyEdit(edit);
 	}
@@ -242,7 +292,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 			});
 			const ani = {
 				name: word[1],
-				heightVar: word[2],
+				framesVar: word[2],
 				widthVar: word[3],
 				data,
 			};
