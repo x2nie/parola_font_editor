@@ -342,7 +342,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 	private getHtmlForWebview(webview: vscode.Webview): string {
 		// Local path to script and css for the webview
 		const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(
-			this.context.extensionUri, 'media', 'catScratch.js'));
+			this.context.extensionUri, 'media', 'parolaSprite.js'));
 		// const owlUri = webview.asWebviewUri(vscode.Uri.joinPath(
 		// 	this.context.extensionUri, 'media', 'owl.js'));
 		const owlUri = webview.asWebviewUri(vscode.Uri.joinPath(
