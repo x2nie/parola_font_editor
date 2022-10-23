@@ -17,20 +17,28 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCustomEditor:catCustoms.catScratch"
+		"onCustomEditor:parola.spriteEditor"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"customEditors": [
 			{
-				"viewType": "catCustoms.catScratch",
-				"displayName": "Cat Scratch",
+				"viewType": "parola.spriteEditor",
+				"displayName": "Parola Sprite Editor",
 				"selector": [
 					{"filenamePattern": "*.ino"},
 					{"filenamePattern": "*.h"}
-				]
+				],
+				"priority": "option"
 			}
-		]
+		],
+		"commands": [
+			{
+			  "command": "parola.spriteEditor.openFile",
+			  "title": "Parola Sprite: Open Active File in Parola Sprite Editor",
+			  "icon": "$(zap)"
+			}
+		  ]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

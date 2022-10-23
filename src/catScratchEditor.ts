@@ -29,7 +29,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 		return providerRegistration;
 	}
 
-	private static readonly viewType = 'catCustoms.catScratch';
+	private static readonly viewType = 'parola.spriteEditor';
 	private lastLine = -1;
 
 	// private static readonly scratchCharacters = ['😸', '😹', '😺', '😻', '😼', '😽', '😾', '🙀', '😿', '🐱'];
@@ -380,7 +380,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 				<link href="${styleVSCodeUri}" rel="stylesheet" />
 				<link href="${styleMainUri}" rel="stylesheet" />
 
-				<title>Cat Scratch</title>
+				<title>Parola Editor</title>
 			</head>
 			<body>
 				<div class="hidden-assets">
@@ -389,9 +389,6 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 					<canvas id="big-pat-on"></canvas>
 					<canvas id="big-pat-off"></canvas>
 				</div>
-					<!-- <div class="add-button">
-						<button>Scratch!</button>
-					</div> -->
 				
 				<script nonce="${nonce}" src="${owlUri}"></script>
 				<script nonce="${nonce}" src="${owlTemplateUri}"></script>
