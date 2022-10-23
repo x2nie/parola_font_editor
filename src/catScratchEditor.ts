@@ -87,9 +87,9 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 				// 	this.addNewScratch(document);
 				// 	return;
 
-				// case 'delete':
-				// 	this.deleteScratch(document, e.id);
-				// 	return;
+				case 'delete':
+					this.deleteDocumentLine(document, e.index);
+					return;
 
 				case 'line-modified':
 					this.updatetDocumentLine(document, e.index, e.data);
@@ -141,6 +141,19 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 			range,
 			// JSON.stringify(json, null, 2)
 			line + eol,
+		);
+
+		return vscode.workspace.applyEdit(edit);
+	}
+
+	private deleteDocumentLine(document: vscode.TextDocument, lineIndex: number) {
+		// console.log('line-insert 1:', `"${line}"`, '@', lineIndex);
+		const edit = new vscode.WorkspaceEdit();
+		const range = document.lineAt(lineIndex).rangeIncludingLineBreak;
+
+		edit.delete(
+			document.uri,
+			range,
 		);
 
 		return vscode.workspace.applyEdit(edit);

@@ -309,6 +309,12 @@
             }
             directLineModify(this.env.editingLine, null, flip)
         }
+        delete(){
+            vscode.postMessage({
+                type: 'delete',
+                index: this.env.editingLine,
+            });
+        }
     }
 
     class Anim extends Component {
