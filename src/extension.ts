@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { CatScratchEditorProvider } from './catScratchEditor';
+import { CatScratchEditorProvider } from './parolaSpriteEditor';
 
 export function activate(context: vscode.ExtensionContext) {
 	const openWithCommand = vscode.commands.registerCommand("parola.spriteEditor.openFile", () => {
