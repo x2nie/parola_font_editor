@@ -102,6 +102,9 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 				case 'firstload':
 					updateWebview();
 					return;
+				case 'new-anim':
+					this.newAnim(document);
+					return;
 			}
 		});
 
@@ -109,10 +112,10 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 	}
 
 	private updatetDocumentLine(document: vscode.TextDocument, lineIndex: number, line:string) {
-		console.log('line-edit 1:', `"${line}"`, '@', lineIndex);
+		// console.log('line-edit 1:', `"${line}"`, '@', lineIndex);
 		const edit = new vscode.WorkspaceEdit();
 		const range = document.lineAt(lineIndex).range;
-		console.log('line-edit:', line, '@', lineIndex, 'range:',range);
+		// console.log('line-edit:', typeof line, '@', lineIndex, 'range:',range);
 
 		// Just replace the entire document every time for this example extension.
 		// A more complete extension should compute minimal edits instead.
@@ -130,16 +133,12 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 		// console.log('line-insert 1:', `"${line}"`, '@', lineIndex);
 		const edit = new vscode.WorkspaceEdit();
 		const range = document.lineAt(lineIndex).range.start;
-		console.log('line-insert:', line, '@', lineIndex, 'range:',range);
+		// console.log('line-insert:', typeof line, '@', lineIndex, 'range:',range);
 		const eol = document.eol == 1 ? '\n' : '\r\n';
 
-		// Just replace the entire document every time for this example extension.
-		// A more complete extension should compute minimal edits instead.
 		edit.insert(
 			document.uri,
-			// new vscode.Range(lineIndex, 0, lineIndex, range.character),
 			range,
-			// JSON.stringify(json, null, 2)
 			line + eol,
 		);
 
@@ -158,6 +157,47 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 
 		return vscode.workspace.applyEdit(edit);
 	}
+
+	private async newAnim(document: vscode.TextDocument) {
+		const spriteName = await vscode.window.showInputBox({
+            placeHolder: 'pacman3',
+            prompt: 'Name',
+            validateInput: (val) => {
+                if (val==='') {
+                    return 'Please enter a name for the app!';
+                }
+                if (val.indexOf(' ') >=0) {
+                    return 'Name cannot contains space';
+                }
+            },
+        });
+		if(spriteName==undefined) return;
+
+		const edit = new vscode.WorkspaceEdit();
+		const range = document.lineAt(this.lastLine + 1).range.start;
+		// console.log('line-insert:', typeof line, '@', lineIndex, 'range:',range);
+		const NAME = spriteName?.toUpperCase();
+		const eol = document.eol == 1 ? '\n' : '\r\n';
+		const lines = [
+			'',
+			`const uint8_t F_${NAME} = 1;`,
+			`const uint8_t W_${NAME} = 8;`,
+			`const uint8_t PROGMEM ${spriteName}[F_${NAME} * W_${NAME}] =  // ${spriteName}`,
+			`{`,
+			`	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,`,
+			`};${eol}`,
+			
+		];
+
+		edit.insert(
+			document.uri,
+			range,
+			lines.join(eol),
+		);
+
+		return vscode.workspace.applyEdit(edit);
+	}
+
 
 	private getDataForWebview(vsdoc: vscode.TextDocument): object {
 		
@@ -216,14 +256,14 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 		regEx = /const\s+uint8_t\s+(\w+)\s*=\s*([0-9a-fA-Fx]+)\s*;/g;
 		while ((word = regEx.exec(text))) {
 			// console.log('var:',word);
-			// const startPos = vsdoc.positionAt(word.index);
+			const startPos = vsdoc.positionAt(word.index);
 			// line = lines[startPos.line+2];
-			const ani = {
+			const avar = {
 				name: word[1],
-				heightVar: word[2],
-				widthVar: word[3],
+				lineIndex: startPos.line,
+				value: word[2],
 			};
-			vars[word[1]] = word[2];
+			vars[word[1]] = avar;
 
 			//array
 		}

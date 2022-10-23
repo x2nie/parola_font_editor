@@ -309,10 +309,28 @@
             }
             directLineModify(this.env.editingLine, null, flip)
         }
+        duplicate(){
+            const sprite = this.env.codes[`${this.env.editingLine}`];
+            const txt = `${sprite}`
+            const lineIndex = Number(this.env.editingLine+1)
+            console.log('duplicate.sprite:',sprite,'@', lineIndex)
+            sprites.nextEditingLine = lineIndex;
+            // sprites.editingLine = lineIndex;
+            vscode.postMessage({
+                type: 'line-insert',
+                index: lineIndex,
+                data: txt,
+            });
+        }
         delete(){
             vscode.postMessage({
                 type: 'delete',
                 index: this.env.editingLine,
+            });
+        }
+        newAnim(){
+            vscode.postMessage({
+                type: 'new-anim',
             });
         }
     }

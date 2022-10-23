@@ -31,8 +31,9 @@ owl.App.registerTemplate("Toolbox", function Toolbox(app, bdom, helpers
   let { text, createBlock, list, multi, html, toggler, comment } = bdom;
   
   let block2 = createBlock(`<div class="toolbox"><span title="Pencil" block-attribute-0="class" block-handler-1="click">Pen</span><span title="Eraser" block-attribute-2="class" block-handler-3="click">Eraser</span></div>`);
-  let block3 = createBlock(`<div class="toolbox"><span block-handler-0="click">Invert</span><span block-handler-1="click">Flip H</span><span block-handler-2="click">Flip V</span><span block-handler-3="click">Clear</span></div>`);
-  let block4 = createBlock(`<div class="toolbox"><span block-handler-0="click">Duplicate</span><span block-handler-1="click">Swipe Before</span><span block-handler-2="click">Swipe After</span><span block-handler-3="click">Delete</span></div>`);
+  let block3 = createBlock(`<div class="toolbox"><span title="New Anim" block-handler-0="click">New Anim</span></div>`);
+  let block4 = createBlock(`<div class="toolbox"><span block-handler-0="click">Invert</span><span block-handler-1="click">Flip H</span><span block-handler-2="click">Flip V</span><span block-handler-3="click">Clear</span></div>`);
+  let block5 = createBlock(`<div class="toolbox"><span block-handler-0="click">Duplicate</span><span block-handler-1="click">Swipe Before</span><span block-handler-2="click">Swipe After</span><span block-handler-3="click">Delete</span></div>`);
   
   return function template(ctx, node, key = "") {
     let attr1 = `pencil on ${ctx['state'].pencilOn?'active':''}`;
@@ -40,17 +41,19 @@ owl.App.registerTemplate("Toolbox", function Toolbox(app, bdom, helpers
     let attr2 = `pencil off ${!ctx['state'].pencilOn?'active':''}`;
     let hdlr2 = [()=>this.state.pencilOn=false, ctx];
     const b2 = block2([attr1, hdlr1, attr2, hdlr2]);
-    let hdlr3 = [ctx['invert'], ctx];
-    let hdlr4 = [ctx['flipH'], ctx];
-    let hdlr5 = [ctx['flipV'], ctx];
-    let hdlr6 = [ctx['clear'], ctx];
-    const b3 = block3([hdlr3, hdlr4, hdlr5, hdlr6]);
-    let hdlr7 = [ctx['duplicate'], ctx];
-    let hdlr8 = [ctx['swipeBefore'], ctx];
-    let hdlr9 = [ctx['swipAfter'], ctx];
-    let hdlr10 = [ctx['delete'], ctx];
-    const b4 = block4([hdlr7, hdlr8, hdlr9, hdlr10]);
-    return multi([b2, b3, b4]);
+    let hdlr3 = [ctx['newAnim'], ctx];
+    const b3 = block3([hdlr3]);
+    let hdlr4 = [ctx['invert'], ctx];
+    let hdlr5 = [ctx['flipH'], ctx];
+    let hdlr6 = [ctx['flipV'], ctx];
+    let hdlr7 = [ctx['clear'], ctx];
+    const b4 = block4([hdlr4, hdlr5, hdlr6, hdlr7]);
+    let hdlr8 = [ctx['duplicate'], ctx];
+    let hdlr9 = [ctx['swipeBefore'], ctx];
+    let hdlr10 = [ctx['swipAfter'], ctx];
+    let hdlr11 = [ctx['delete'], ctx];
+    const b5 = block5([hdlr8, hdlr9, hdlr10, hdlr11]);
+    return multi([b2, b3, b4, b5]);
   }
 });
 
@@ -60,7 +63,7 @@ owl.App.registerTemplate("Anim", function Anim(app, bdom, helpers
   let { prepareList, withKey } = helpers;
   const comp1 = app.createComponent(`Sprite`, true, false, false, false);
   
-  let block1 = createBlock(`<div class="greeter"><block-text-0/><block-child-0/><div class="btn" block-handler-1="click">+</div><hr/></div>`);
+  let block1 = createBlock(`<div class="animation"><block-text-0/><block-child-0/><div class="btn" block-handler-1="click">+</div><hr/></div>`);
   
   return function template(ctx, node, key = "") {
     let txt1 = ctx['anim'].name;
