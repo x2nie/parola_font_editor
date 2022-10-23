@@ -46,6 +46,13 @@ const uint8_t PROGMEM uraa[F_URAA * W_URAA] =  // uraa
  0x81, 0x42, 0x24, 0x18, 0x18, 0x24, 0x42, 0x99,
 };
 
+const uint8_t F_FISTS = 1;
+const uint8_t W_FISTS = 8;
+const uint8_t PROGMEM fists[F_FISTS * W_FISTS] =  // fists
+{
+ 0x3c, 0x4e, 0x81, 0x89, 0x81, 0x89, 0x81, 0x7e,
+};
+
 void setup(void)
 {
   P.begin();

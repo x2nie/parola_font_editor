@@ -36,7 +36,7 @@
 		<t t-foreach="anim.sprites" t-as="sprite" t-key="sprite_index">
 			<Sprite line="sprite" anim_index="props.anim_index"/>
 		</t>
-		<div class="btn" t-on-click="add">+</div>
+		<!-- <div class="btn" t-on-click="add">+</div> -->
 		<hr />
 	</div>
 

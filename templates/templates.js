@@ -65,7 +65,7 @@ owl.App.registerTemplate("Anim", function Anim(app, bdom, helpers
   let { prepareList, withKey } = helpers;
   const comp1 = app.createComponent(`Sprite`, true, false, false, false);
   
-  let block1 = createBlock(`<div class="animation"><block-text-0/><block-child-0/><div class="btn" block-handler-1="click">+</div><hr/></div>`);
+  let block1 = createBlock(`<div class="animation"><block-text-0/><block-child-0/><!-- <div class="btn" t-on-click="add">+</div> --><hr/></div>`);
   
   return function template(ctx, node, key = "") {
     let txt1 = ctx['anim'].name;
@@ -79,8 +79,7 @@ owl.App.registerTemplate("Anim", function Anim(app, bdom, helpers
     }
     ctx = ctx.__proto__;
     const b2 = list(c_block2);
-    let hdlr1 = [ctx['add'], ctx];
-    return block1([txt1, hdlr1], [b2]);
+    return block1([txt1], [b2]);
   }
 });
 
