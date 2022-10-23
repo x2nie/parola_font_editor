@@ -17,22 +17,24 @@
 		</div>
 		<div class="toolbox">
 			<span t-on-click="invert">Invert</span>
-			<span t-on-click="flipH">Flip H</span>
-			<span t-on-click="flipV">Flip V</span>
+			<span title="Flip Horizontally" t-on-click="flipH">Flip H</span>
+			<span title="Flip Vertically" t-on-click="flipV">Flip V</span>
 			<span t-on-click="clear">Clear</span>
+			<span t-on-click="appendColumn">+Column</span>
+			<span t-on-click="popColumn">-Column</span>
 		</div>
 		<div class="toolbox">
 			<span t-on-click="duplicate">Duplicate</span>
 			<span t-on-click="swipeBefore">Swipe Before</span>
 			<span t-on-click="swipAfter">Swipe After</span>
-			<span t-on-click="delete">Delete</span>
+			<span title="Delete sprite" t-on-click="delete">Delete</span>
 		</div>
 	</t>
 
 	<div t-name="Anim" class="animation">
 		<t t-esc="anim.name" />
 		<t t-foreach="anim.sprites" t-as="sprite" t-key="sprite_index">
-			<Sprite line="sprite" />
+			<Sprite line="sprite" anim_index="props.anim_index"/>
 		</t>
 		<div class="btn" t-on-click="add">+</div>
 		<hr />
@@ -41,12 +43,13 @@
 	<div t-name="Root" class="app">
 		<div class="editor-area">
 			<Toolbox/>
+			<h1><t t-raw="editorTitle"/></h1>
 			<SpriteEditor led="'big'" line="editorData" />
 		</div>
 		<div class="minimap-shadow"></div>
 		<div class="anims">
 			<t t-foreach="env.anims" t-as="anim" t-key="anim.name">
-				<Anim anim="anim" />
+				<Anim anim="anim" anim_index="anim_index"/>
 			</t>
 		</div>
 	</div>

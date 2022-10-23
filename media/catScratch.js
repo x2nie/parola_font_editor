@@ -5,7 +5,7 @@
     // @ts-ignore
     // In this implementation, we use the owl reactivity mechanism.
     const { Component, useState, mount, useRef, onPatched, onMounted, reactive, useEnv, useEffect } = owl;
-    const sprites = reactive({ anims: [], vars: {}, codes:{}, editingLine: 0, nextEditingLine:0 }, (e) => console.log("changed:",e));
+    const sprites = reactive({ anims: [], vars: {}, codes:{}, editingLine: 0, editingAnim:-1, nextEditingLine:0 }, (e) => console.log("changed:",e));
     const drawingState = reactive({ pencilOn: true }, (e) => console.log("changed:",e));
     const ledSmall = {width: 4, padding:0.5}
     const ledBig = {width: 15, padding:2}
@@ -77,6 +77,7 @@
 
         selectme() {
             sprites.editingLine = this.state.lineIndex;
+            sprites.editingAnim = this.props.anim_index;
         }
 
         toggle(i) {
@@ -379,6 +380,13 @@
         get raw_anims(){
             return JSON.stringify(this.env.anims)
         }
+        get editorTitle(){
+            let title = '';
+            if(this.env.editingAnim>=0 && this.env.anims.length > this.env.editingAnim){
+                title =  this.env.anims[this.env.editingAnim].name;
+            }
+            return `${title} #${this.env.editingLine}`
+        }
         get editorData(){
             if(!Object.keys(this.env.codes).includes(`${this.env.editingLine}`)) {
                 console.log('no editing:' )
@@ -490,6 +498,7 @@
 
             console.log('sprites.editingLine :=', Object.keys(data.codes)[0])
             sprites.editingLine = Object.keys(data.codes)[0]
+            sprites.editingAnim =  data.anims.length > 0 ? 0 : -1;
         }
         if(sprites.nextEditingLine){
             sprites.editingLine = sprites.nextEditingLine;
