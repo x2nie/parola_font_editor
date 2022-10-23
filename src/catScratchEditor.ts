@@ -357,7 +357,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 			this.context.extensionUri, 'media', 'vscode.css'));
 
 		const styleMainUri = webview.asWebviewUri(vscode.Uri.joinPath(
-			this.context.extensionUri, 'media', 'catScratch.css'));
+			this.context.extensionUri, 'media', 'parolaSprite.css'));
 
 		// Use a nonce to whitelist which scripts can be run
 		const nonce = getNonce();
