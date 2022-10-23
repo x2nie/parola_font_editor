@@ -95,8 +95,8 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 				// 	this.addNewScratch(document);
 				// 	return;
 
-				case 'delete':
-					this.deleteDocumentLine(document, e.index);
+				case 'line-delete':
+					this.deleteDocumentLine(document, e.index, e.config);
 					return;
 
 				case 'line-modified':
@@ -108,7 +108,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 					return;
 
 				case 'line-insert':
-					this.insertDocumentLine(document, e.index, e.data);
+					this.insertDocumentLine(document, e.index, e.data, e.config);
 					return;
 
 				case 'firstload':
@@ -179,7 +179,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 
 		return vscode.workspace.applyEdit(edit);
 	}
-	private insertDocumentLine(document: vscode.TextDocument, lineIndex: number, line:string) {
+	private insertDocumentLine(document: vscode.TextDocument, lineIndex: number, line:string, config:SpriteConfig|undefined) {
 		// console.log('line-insert 1:', `"${line}"`, '@', lineIndex);
 		const edit = new vscode.WorkspaceEdit();
 		const range = document.lineAt(lineIndex).range.start;
@@ -192,10 +192,14 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 			line + eol,
 		);
 
+		if(config){
+			this.updateAnimConfig(document, edit, config);
+		}
+
 		return vscode.workspace.applyEdit(edit);
 	}
 
-	private deleteDocumentLine(document: vscode.TextDocument, lineIndex: number) {
+	private deleteDocumentLine(document: vscode.TextDocument, lineIndex: number, config:SpriteConfig|undefined) {
 		// console.log('line-insert 1:', `"${line}"`, '@', lineIndex);
 		const edit = new vscode.WorkspaceEdit();
 		const range = document.lineAt(lineIndex).rangeIncludingLineBreak;
@@ -204,6 +208,10 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 			document.uri,
 			range,
 		);
+
+		if(config){
+			this.updateAnimConfig(document, edit, config);
+		}
 
 		return vscode.workspace.applyEdit(edit);
 	}

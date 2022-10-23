@@ -317,16 +317,20 @@
             console.log('duplicate.sprite:',sprite,'@', lineIndex)
             sprites.nextEditingLine = lineIndex;
             // sprites.editingLine = lineIndex;
+            const config = buildConfig('F', +1)
             vscode.postMessage({
                 type: 'line-insert',
                 index: lineIndex,
                 data: txt,
+                config,
             });
         }
         delete(){
+            const config = buildConfig('F', -1)
             vscode.postMessage({
-                type: 'delete',
+                type: 'line-delete',
                 index: this.env.editingLine,
+                config,
             });
         }
         newAnim(){

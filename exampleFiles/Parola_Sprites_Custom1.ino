@@ -28,7 +28,7 @@ MD_Parola P = MD_Parola(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
 const char msg[] = "Parola Sprites";
 
 // Sprite Definition
-const uint8_t F_ROCKET = 2;
+const uint8_t F_ROCKET = 3;
 const uint8_t W_ROCKET = 11;
 const uint8_t PROGMEM rocket[F_ROCKET * W_ROCKET] =  // rocket
 {
@@ -37,10 +37,11 @@ const uint8_t PROGMEM rocket[F_ROCKET * W_ROCKET] =  // rocket
   0xc0, 0xe0, 0x50, 0x28, 0x15, 0x0a, 0x06, 0x09, 0x00, 0x00, 0x00,
 };
 
-const uint8_t F_URAA = 1;
+const uint8_t F_URAA = 3;
 const uint8_t W_URAA = 8;
 const uint8_t PROGMEM uraa[F_URAA * W_URAA] =  // uraa
 {
+ 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80,
  0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80,
  0x81, 0x42, 0x24, 0x18, 0x18, 0x24, 0x42, 0x99,
 };
