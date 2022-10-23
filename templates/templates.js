@@ -32,7 +32,7 @@ owl.App.registerTemplate("Toolbox", function Toolbox(app, bdom, helpers
   
   let block2 = createBlock(`<div class="toolbox"><span title="Pencil" block-attribute-0="class" block-handler-1="click">Pen</span><span title="Eraser" block-attribute-2="class" block-handler-3="click">Eraser</span></div>`);
   let block3 = createBlock(`<div class="toolbox"><span title="New Anim" block-handler-0="click">New Anim</span></div>`);
-  let block4 = createBlock(`<div class="toolbox"><span block-handler-0="click">Invert</span><span title="Flip Horizontally" block-handler-1="click">Flip H</span><span title="Flip Vertically" block-handler-2="click">Flip V</span><span block-handler-3="click">Clear</span><span block-handler-4="click">+Column</span><span block-handler-5="click">-Column</span></div>`);
+  let block4 = createBlock(`<div class="toolbox"><span block-handler-0="click">Invert</span><span title="Flip Horizontally" block-handler-1="click">Flip H</span><span title="Flip Vertically" block-handler-2="click">Flip V</span><span block-handler-3="click">Clear</span><span block-handler-4="click">+ Column</span><span block-handler-5="click">- Column</span><span title="Shift Left" block-handler-6="click">&lt;</span><span title="Shift Up" block-handler-7="click">^</span><span title="Shift Down" block-handler-8="click">v</span><span title="Shift Right" block-handler-9="click">&gt;</span></div>`);
   let block5 = createBlock(`<div class="toolbox"><span block-handler-0="click">Duplicate</span><span block-handler-1="click">Swipe Before</span><span block-handler-2="click">Swipe After</span><span title="Delete sprite" block-handler-3="click">Delete</span></div>`);
   
   return function template(ctx, node, key = "") {
@@ -49,12 +49,16 @@ owl.App.registerTemplate("Toolbox", function Toolbox(app, bdom, helpers
     let hdlr7 = [ctx['clear'], ctx];
     let hdlr8 = [ctx['appendColumn'], ctx];
     let hdlr9 = [ctx['popColumn'], ctx];
-    const b4 = block4([hdlr4, hdlr5, hdlr6, hdlr7, hdlr8, hdlr9]);
-    let hdlr10 = [ctx['duplicate'], ctx];
-    let hdlr11 = [ctx['swipeBefore'], ctx];
-    let hdlr12 = [ctx['swipAfter'], ctx];
-    let hdlr13 = [ctx['delete'], ctx];
-    const b5 = block5([hdlr10, hdlr11, hdlr12, hdlr13]);
+    let hdlr10 = [ctx['shiftLeft'], ctx];
+    let hdlr11 = [ctx['shiftUp'], ctx];
+    let hdlr12 = [ctx['shiftDown'], ctx];
+    let hdlr13 = [ctx['shiftRight'], ctx];
+    const b4 = block4([hdlr4, hdlr5, hdlr6, hdlr7, hdlr8, hdlr9, hdlr10, hdlr11, hdlr12, hdlr13]);
+    let hdlr14 = [ctx['duplicate'], ctx];
+    let hdlr15 = [ctx['swipeBefore'], ctx];
+    let hdlr16 = [ctx['swipAfter'], ctx];
+    let hdlr17 = [ctx['delete'], ctx];
+    const b5 = block5([hdlr14, hdlr15, hdlr16, hdlr17]);
     return multi([b2, b3, b4, b5]);
   }
 });

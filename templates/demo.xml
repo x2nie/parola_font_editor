@@ -20,8 +20,12 @@
 			<span title="Flip Horizontally" t-on-click="flipH">Flip H</span>
 			<span title="Flip Vertically" t-on-click="flipV">Flip V</span>
 			<span t-on-click="clear">Clear</span>
-			<span t-on-click="appendColumn">+Column</span>
-			<span t-on-click="popColumn">-Column</span>
+			<span t-on-click="appendColumn">+ Column</span>
+			<span t-on-click="popColumn">- Column</span>
+			<span title="Shift Left" t-on-click="shiftLeft">&lt;</span>
+			<span title="Shift Up" t-on-click="shiftUp">^</span>
+			<span title="Shift Down" t-on-click="shiftDown">v</span>
+			<span title="Shift Right" t-on-click="shiftRight">&gt;</span>
 		</div>
 		<div class="toolbox">
 			<span t-on-click="duplicate">Duplicate</span>

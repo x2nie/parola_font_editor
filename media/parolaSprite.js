@@ -310,6 +310,28 @@
             }
             directLineModify(this.env.editingLine, null, flip)
         }
+        shiftLeft() {
+            function shift(numbers){
+                const [first, ...nums] = [...numbers];
+                nums.push(0)
+                return nums;
+            }
+            directLineModify(this.env.editingLine, null, shift)
+        }
+        shiftRight() {
+            function shift(numbers){
+                const nums = [0,...numbers];
+                nums.pop()
+                return nums;
+            }
+            directLineModify(this.env.editingLine, null, shift)
+        }
+        shiftDown() {
+            directLineModify(this.env.editingLine, (n) => (n << 1) & 0xff)
+        }
+        shiftUp() {
+            directLineModify(this.env.editingLine, (n) => (n >> 1) & 0xff)
+        }
         duplicate(){
             const sprite = this.env.codes[`${this.env.editingLine}`];
             const txt = `${sprite}`
