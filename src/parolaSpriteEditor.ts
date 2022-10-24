@@ -242,7 +242,7 @@ export class CatScratchEditorProvider implements vscode.CustomTextEditorProvider
 			`const uint8_t W_${NAME} = 8;`,
 			`const uint8_t PROGMEM ${spriteName}[F_${NAME} * W_${NAME}] =  // ${spriteName}`,
 			`{`,
-			`	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,`,
+			`  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,`,
 			`};${eol}`,
 			
 		];
